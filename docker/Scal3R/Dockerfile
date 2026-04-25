@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     CONDA_DIR=/opt/conda \
-    CONDA_ENV=Scal3R
+    CONDA_ENV=scal3r
 
 WORKDIR /Scal3R
 
