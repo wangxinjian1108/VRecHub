@@ -1,0 +1,146 @@
+Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow for it.
+
+## Argument
+`$ARGUMENTS` is the submodule path or name (e.g. `thirdparty/Scal3R` or just `Scal3R`).
+
+## Steps
+
+1. **Locate the submodule** — search `.gitmodules` to resolve the full path if only a name was given. Read the submodule directory to understand the project type.
+
+2. **Detect project type, Python version & CUDA version** — check for `pyproject.toml`, `requirements.txt`, `package.json`, `go.mod`, `Cargo.toml`, `pom.xml`, etc. Read the relevant file AND the README and any install scripts to understand dependencies, entry points, and version requirements:
+   - **Python version**: read `requires-python` in `pyproject.toml`, or explicit version in install scripts / README. If not specified, default to 3.11.
+   - **CUDA version**: look for explicit mentions in README, install scripts, or `requirements.txt` (e.g. `torch` index URLs like `cu118`, `cu126`, `cu128`). If not found, default to CUDA 12.6.
+   - Map the required CUDA version to the appropriate official image tag: `nvidia/cuda:<cuda-version>-cudnn-devel-ubuntu22.04` (e.g. CUDA 11.8 → `nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04`, CUDA 12.1 → `nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04`, CUDA 12.6 → `nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04`, CUDA 12.8 → `nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04`)
+   - Use the detected CUDA version to pick the correct PyTorch wheel index URL (cu118 / cu126 / cu128)
+   - Use the detected Python version when creating the conda env
+
+3. **Create the Dockerfile** — write `docker/<repo-name>/Dockerfile` (repo-name is the last path segment of the submodule, create the directory if it doesn't exist). Follow this structure exactly, in order:
+
+   **a. Base image & ENV block**
+   - Use the CUDA base image selected in step 2
+   - Set these ENV vars in a single `ENV` instruction:
+     ```dockerfile
+     ENV DEBIAN_FRONTEND=noninteractive \
+         PYTHONDONTWRITEBYTECODE=1 \
+         PYTHONUNBUFFERED=1 \
+         PIP_NO_CACHE_DIR=1 \
+         CONDA_DIR=/opt/conda \
+         CONDA_ENV=<repo-name>
+     ```
+
+   **b. WORKDIR**
+   - Set `WORKDIR` to `/<repo-name>`
+
+   **c. apt packages**
+   - Install this fixed base set of packages (always include all of them), **one package per line**, then clean up:
+     ```dockerfile
+     RUN apt-get update && apt-get install -y --no-install-recommends \
+         git \
+         zsh \
+         vim \
+         git-lfs \
+         wget \
+         unzip \
+         bzip2 \
+         ca-certificates \
+         openssh-server \
+         clang-format \
+         htop \
+         iotop \
+         rsync \
+         ffmpeg \
+         curl \
+         cmake \
+         make \
+         less \
+         time \
+         sqlite3 \
+         tree \
+         gdb \
+         g++ \
+         ninja-build \
+         build-essential \
+         tmux \
+         locales \
+         lsb-release \
+         nano \
+         nethogs \
+         net-tools \
+         valgrind \
+         xz-utils \
+         sudo \
+         pciutils \
+         && rm -rf /var/lib/apt/lists/*
+     ```
+   - Thoroughly inspect all available sources to determine which extra system packages are needed — read ALL of the following that exist:
+     - `pyproject.toml`, `requirements.txt`, `setup.py`, `setup.cfg`
+     - `README.md`, `docs/install.md` and any other docs files
+     - Install scripts (`scripts/install.sh`, `Makefile`, etc.)
+     - Any CI config files (`.github/workflows/*.yml`, `.travis.yml`, `Dockerfile` if present)
+   - Map Python dependencies to their system-level requirements. Common examples:
+     - `opencv-python`, `open3d` → `libgl1`, `libglib2.0-0`
+     - `opencv-python` with display → also `libsm6`, `libxext6`, `libxrender-dev`
+     - `soundfile`, `librosa` → `libsndfile1`
+     - `numba`, `faiss` → `libgomp1`
+     - `pyopengl` → `libgl1`, `libglu1-mesa`
+   - Do not add packages that are not required by the project
+
+   **d. Miniconda + conda env**
+   - Install Miniconda, accept TOS for both default channels, create the conda env, clean cache — all in one `RUN` layer:
+     ```dockerfile
+     RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+         && bash /tmp/miniconda.sh -b -p "${CONDA_DIR}" \
+         && rm -f /tmp/miniconda.sh \
+         && "${CONDA_DIR}/bin/conda" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
+         && "${CONDA_DIR}/bin/conda" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
+         && "${CONDA_DIR}/bin/conda" create -n "${CONDA_ENV}" python=<detected-python-version> -y \
+         && "${CONDA_DIR}/bin/conda" clean -afy
+     ```
+
+   **e. SSH host keys**
+   ```dockerfile
+   RUN mkdir -p /var/run/sshd /root/.ssh \
+       && ssh-keygen -A
+   ```
+
+   **f. PATH**
+   ```dockerfile
+   ENV PATH=${CONDA_DIR}/envs/${CONDA_ENV}/bin:${CONDA_DIR}/bin:${PATH}
+   ```
+
+   **g. Copy submodule & install dependencies**
+   - All submodules are available in the build context (repo root). Use `COPY <submodule-path> .` to copy the target submodule, and `COPY <other-submodule-path> <other-submodule-path>` for any dependency submodules — do NOT use `git clone` or `pip install git+https://` during build
+   - Read the submodule's README and install scripts to understand the correct install order (e.g. torch before requirements.txt). Use `conda run -n "${CONDA_ENV}"` for all pip/python commands
+   - Install dependencies, then **remove source directories in the same `RUN` layer** to keep the image clean
+
+   **h. HuggingFace model download block**
+   - Always include this commented block after dependency installation:
+     ```dockerfile
+     # --- HuggingFace model download ---
+     # For public models:
+     # RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('org/model-name', local_dir='/models/model-name')"
+     # For private models (token injected via BuildKit secret, never baked into the image):
+     # RUN --mount=type=secret,id=hf_token \
+     #     HF_TOKEN=$(cat /run/secrets/hf_token) python -c \
+     #     "from huggingface_hub import snapshot_download; snapshot_download('org/model-name', local_dir='/models/model-name', token=open('/run/secrets/hf_token').read().strip())"
+     # ----------------------------------
+     ```
+   - If the README mentions specific checkpoints/models, add commented `RUN` lines for each one above the generic template
+
+   **i. CMD / ENTRYPOINT**
+   - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)
+
+4. **Create the GitHub Actions workflow** — write `.github/workflows/docker-<repo-name>.yml`. Use this structure:
+   - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`
+   - Single job `build-and-push` with `ubuntu-latest`
+   - `actions/checkout@v4` with `submodules: recursive`
+   - `docker/setup-buildx-action@v3`
+   - Login to Docker Hub (`secrets.DOCKERHUB_USERNAME` / `secrets.DOCKERHUB_TOKEN`) — skip on PR
+   - Login to ghcr.io (`secrets.GITHUB_TOKEN`) — skip on PR
+   - `docker/metadata-action@v5` with images:
+     - `${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>`
+     - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
+   - Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
+   - `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR
+
+5. **Report** — after writing both files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.

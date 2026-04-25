@@ -1,0 +1,3 @@
+[submodule "thirdparty/Scal3R"]
+	path = thirdparty/Scal3R
+	url = git@github.com:wangxinjian1108/Scal3R.git
