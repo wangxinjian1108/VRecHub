@@ -39,9 +39,11 @@ jobs:
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         with:
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/scal3r
+            ${{ env.DOCKERHUB_USERNAME }}/scal3r
             ghcr.io/${{ github.repository_owner }}/scal3r
           tags: |
             type=ref,event=branch
