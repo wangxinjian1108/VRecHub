@@ -86,13 +86,13 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
    - Do not add packages that are not required by the project
 
    **d. Miniconda + conda env**
-   - Install Miniconda, accept TOS for both default channels, create the conda env, clean cache — all in one `RUN` layer:
+   - Install Miniconda, accept TOS for both default channels (without `--override-channels`), create the conda env, clean cache — all in one `RUN` layer:
      ```dockerfile
      RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
          && bash /tmp/miniconda.sh -b -p "${CONDA_DIR}" \
          && rm -f /tmp/miniconda.sh \
-         && "${CONDA_DIR}/bin/conda" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
-         && "${CONDA_DIR}/bin/conda" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
+         && "${CONDA_DIR}/bin/conda" tos accept --channel https://repo.anaconda.com/pkgs/main \
+         && "${CONDA_DIR}/bin/conda" tos accept --channel https://repo.anaconda.com/pkgs/r \
          && "${CONDA_DIR}/bin/conda" create -n "${CONDA_ENV}" python=<detected-python-version> -y \
          && "${CONDA_DIR}/bin/conda" clean -afy
      ```
