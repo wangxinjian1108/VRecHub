@@ -75,7 +75,25 @@ jobs:
           context: .
           file: docker/Scal3R/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Login to Zelos Harbor
+        if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
+        env:
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+        run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
+
+      - name: Tag and push to Zelos Harbor
+        if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
+        env:
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+        run: |
+          for tag in ${{ steps.meta.outputs.tags }}; do
+            harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud/auto/scal3r:${tag##*:}"
+            docker tag "$tag" "$harbor_tag"
+            docker push "$harbor_tag"
+          done

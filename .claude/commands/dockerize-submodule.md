@@ -130,6 +130,8 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
    **i. CMD / ENTRYPOINT**
    - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)
 
+3.5. **Ask about Zelos Harbor** — use AskUserQuestion to ask the user whether to also push to Zelos Harbor (`harbor-volc.zelostech.com.cn:5443`). If yes, the image will be pushed to `harbor-volc.zelostech.com.cn:5443/zcloud/auto/<repo-name>:<tag>` by default. This will be used in step 4 to add Harbor login, tag, and push steps.
+
 4. **Create the GitHub Actions workflow** — write `.github/workflows/docker-<repo-name>.yml`. Use this structure:
    - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`. Add `paths` filter to both push and pull_request so only relevant changes trigger the build:
      ```yaml
@@ -171,6 +173,25 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
         - `name=${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}`
         - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
      7. Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
-     8. `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR
+     8. `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR. **Important**: when Harbor push is enabled, add `load: true` so the built image is available locally for tagging.
+     9. **(If Harbor enabled)** Add these steps after build-push, skip on PR and when secret is empty:
+        ```yaml
+        - name: Login to Zelos Harbor
+          if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
+          env:
+            HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+          run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
+
+        - name: Tag and push to Zelos Harbor
+          if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
+          env:
+            HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+          run: |
+            for tag in ${{ steps.meta.outputs.tags }}; do
+              harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud/auto/<repo-name>:${tag##*:}"
+              docker tag "$tag" "$harbor_tag"
+              docker push "$harbor_tag"
+            done
+        ```
 
 5. **Report** — after writing both files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.
