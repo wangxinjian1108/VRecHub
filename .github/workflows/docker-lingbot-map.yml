@@ -4,8 +4,16 @@ on:
   push:
     branches: [master]
     tags: ["v*.*.*"]
+    paths:
+      - "docker/lingbot-map/**"
+      - "thirdparty/lingbot-map"
+      - ".github/workflows/docker-lingbot-map.yml"
   pull_request:
     branches: [master]
+    paths:
+      - "docker/lingbot-map/**"
+      - "thirdparty/lingbot-map"
+      - ".github/workflows/docker-lingbot-map.yml"
   workflow_dispatch:
 
 jobs:

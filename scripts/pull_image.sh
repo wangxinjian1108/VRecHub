@@ -11,7 +11,7 @@ IMAGE="$1"
 TAG="${2:-latest}"
 REGISTRY="ghcr.io/wangxinjian1108"
 
-GH_TOKEN="${GH_TOKEN:-$(gh auth token 2>/dev/null || true)}"
+GH_TOKEN="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"
 
 if [[ -z "${GH_TOKEN}" ]]; then
     read -rsp "GitHub Token: " GH_TOKEN

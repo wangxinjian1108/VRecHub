@@ -4,8 +4,16 @@ on:
   push:
     branches: [master]
     tags: ["v*.*.*"]
+    paths:
+      - "docker/Scal3R/**"
+      - "thirdparty/Scal3R"
+      - ".github/workflows/docker-Scal3R.yml"
   pull_request:
     branches: [master]
+    paths:
+      - "docker/Scal3R/**"
+      - "thirdparty/Scal3R"
+      - ".github/workflows/docker-Scal3R.yml"
   workflow_dispatch:
 
 jobs:

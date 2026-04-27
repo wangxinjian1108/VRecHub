@@ -131,7 +131,13 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
    - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)
 
 4. **Create the GitHub Actions workflow** — write `.github/workflows/docker-<repo-name>.yml`. Use this structure:
-   - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`
+   - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`. Add `paths` filter to both push and pull_request so only relevant changes trigger the build:
+     ```yaml
+     paths:
+       - "docker/<repo-name>/**"
+       - "thirdparty/<submodule-path>"
+       - ".github/workflows/docker-<repo-name>.yml"
+     ```
    - Single job `build-and-push` with `ubuntu-latest` and explicit permissions:
      ```yaml
      permissions:
