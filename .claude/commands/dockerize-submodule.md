@@ -187,11 +187,11 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
           env:
             HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
           run: |
-            for tag in ${{ steps.meta.outputs.tags }}; do
+            echo '${{ steps.meta.outputs.tags }}' | while IFS= read -r tag; do
+              [ -z "$tag" ] && continue
               harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>:${tag##*:}"
               docker tag "$tag" "$harbor_tag"
               docker push "$harbor_tag"
             done
-        ```
 
 5. **Report** — after writing both files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.

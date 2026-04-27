@@ -1,19 +1,19 @@
-name: Docker – lingbot-map
+name: Docker – sam3
 
 on:
   push:
     branches: [master]
     tags: ["v*.*.*"]
     paths:
-      - "docker/lingbot-map/**"
-      - "thirdparty/lingbot-map"
-      - ".github/workflows/docker-lingbot-map.yml"
+      - "docker/sam3/**"
+      - "thirdparty/sam3"
+      - ".github/workflows/docker-sam3.yml"
   pull_request:
     branches: [master]
     paths:
-      - "docker/lingbot-map/**"
-      - "thirdparty/lingbot-map"
-      - ".github/workflows/docker-lingbot-map.yml"
+      - "docker/sam3/**"
+      - "thirdparty/sam3"
+      - ".github/workflows/docker-sam3.yml"
   workflow_dispatch:
 
 jobs:
@@ -60,8 +60,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            name=${{ secrets.DOCKERHUB_USERNAME }}/lingbot-map,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
-            ghcr.io/${{ github.repository_owner }}/lingbot-map
+            name=${{ secrets.DOCKERHUB_USERNAME }}/sam3,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
+            ghcr.io/${{ github.repository_owner }}/sam3
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -73,7 +73,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/lingbot-map/Dockerfile
+          file: docker/sam3/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -94,7 +94,7 @@ jobs:
         run: |
           echo '${{ steps.meta.outputs.tags }}' | while IFS= read -r tag; do
             [ -z "$tag" ] && continue
-            harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/lingbot-map:${tag##*:}"
+            harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/sam3:${tag##*:}"
             docker tag "$tag" "$harbor_tag"
             docker push "$harbor_tag"
           done

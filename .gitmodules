@@ -4,3 +4,6 @@
 [submodule "thirdparty/lingbot-map"]
 	path = thirdparty/lingbot-map
 	url = git@github.com:wangxinjian1108/lingbot-map.git
+[submodule "thirdparty/sam3"]
+	path = thirdparty/sam3
+	url = git@github.com:wangxinjian1108/sam3.git
