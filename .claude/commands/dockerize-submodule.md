@@ -130,7 +130,7 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
    **i. CMD / ENTRYPOINT**
    - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)
 
-3.5. **Ask about Zelos Harbor** — use AskUserQuestion to ask the user whether to also push to Zelos Harbor (`harbor-volc.zelostech.com.cn:5443`). If yes, the image will be pushed to `harbor-volc.zelostech.com.cn:5443/zcloud/auto/<repo-name>:<tag>` by default. This will be used in step 4 to add Harbor login, tag, and push steps.
+3.5. **Ask about Zelos Harbor** — use AskUserQuestion to ask the user whether to also push to Zelos Harbor (`harbor-volc.zelostech.com.cn:5443`). If yes, the image will be pushed to `harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>:<tag>` by default. This will be used in step 4 to add Harbor login, tag, and push steps.
 
 4. **Create the GitHub Actions workflow** — write `.github/workflows/docker-<repo-name>.yml`. Use this structure:
    - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`. Add `paths` filter to both push and pull_request so only relevant changes trigger the build:
@@ -188,7 +188,7 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
             HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
           run: |
             for tag in ${{ steps.meta.outputs.tags }}; do
-              harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud/auto/<repo-name>:${tag##*:}"
+              harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>:${tag##*:}"
               docker tag "$tag" "$harbor_tag"
               docker push "$harbor_tag"
             done

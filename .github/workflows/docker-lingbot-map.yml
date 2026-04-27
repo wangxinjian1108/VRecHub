@@ -93,7 +93,7 @@ jobs:
           HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
         run: |
           for tag in ${{ steps.meta.outputs.tags }}; do
-            harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud/auto/lingbot-map:${tag##*:}"
+            harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/lingbot-map:${tag##*:}"
             docker tag "$tag" "$harbor_tag"
             docker push "$harbor_tag"
           done
