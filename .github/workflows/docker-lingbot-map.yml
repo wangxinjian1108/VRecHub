@@ -55,6 +55,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Zelos Harbor
+        if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
+        env:
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+        run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
+
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -62,6 +68,7 @@ jobs:
           images: |
             name=${{ secrets.DOCKERHUB_USERNAME }}/lingbot-map,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
             ghcr.io/${{ github.repository_owner }}/lingbot-map
+            name=harbor-volc.zelostech.com.cn:5443/zcloud_auto/lingbot-map,enable=${{ secrets.HARBOR_USERNAME != '' }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -75,26 +82,7 @@ jobs:
           context: .
           file: docker/lingbot-map/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Login to Zelos Harbor
-        if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
-        env:
-          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-        run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
-
-      - name: Tag and push to Zelos Harbor
-        if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
-        env:
-          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-        run: |
-          echo '${{ steps.meta.outputs.tags }}' | while IFS= read -r tag; do
-            [ -z "$tag" ] && continue
-            harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/lingbot-map:${tag##*:}"
-            docker tag "$tag" "$harbor_tag"
-            docker push "$harbor_tag"
-          done
