@@ -132,15 +132,39 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
 
 4. **Create the GitHub Actions workflow** — write `.github/workflows/docker-<repo-name>.yml`. Use this structure:
    - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`
-   - Single job `build-and-push` with `ubuntu-latest`
-   - `actions/checkout@v4` with `submodules: recursive`
-   - `docker/setup-buildx-action@v3`
-   - Login to Docker Hub (`secrets.DOCKERHUB_USERNAME` / `secrets.DOCKERHUB_TOKEN`) — skip on PR
-   - Login to ghcr.io (`secrets.GITHUB_TOKEN`) — skip on PR
-   - `docker/metadata-action@v5` with images:
-     - `${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>`
-     - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
-   - Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
-   - `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR
+   - Single job `build-and-push` with `ubuntu-latest` and explicit permissions:
+     ```yaml
+     permissions:
+       contents: read
+       packages: write
+     ```
+   - Steps in order:
+     1. `actions/checkout@v4` with `submodules: recursive`
+     2. Free disk space (required for large CUDA base images):
+        ```yaml
+        - name: Free disk space
+          run: |
+            sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+            sudo docker image prune -af
+            df -h
+        ```
+     3. `docker/setup-buildx-action@v3`
+     4. Login to Docker Hub — skip on PR **and** when secret is empty:
+        ```yaml
+        - name: Login to Docker Hub
+          if: github.event_name != 'pull_request' && env.DOCKERHUB_USERNAME != ''
+          env:
+            DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        ```
+     5. Login to ghcr.io — skip on PR (`secrets.GITHUB_TOKEN` always available)
+     6. `docker/metadata-action@v5` with images:
+        - `name=${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}`
+        - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
+     7. Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
+     8. `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR
 
 5. **Report** — after writing both files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.
