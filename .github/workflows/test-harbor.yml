@@ -1,0 +1,22 @@
+name: Test Harbor Push
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-harbor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Zelos Harbor
+        env:
+          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+        run: |
+          echo "HARBOR_USERNAME is set: ${{ secrets.HARBOR_USERNAME != '' }}"
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
+
+      - name: Tag and push test image
+        run: |
+          docker pull hello-world
+          docker tag hello-world harbor-volc.zelostech.com.cn:5443/zcloud_auto/test:latest
+          docker push harbor-volc.zelostech.com.cn:5443/zcloud_auto/test:latest
+          echo "Harbor push succeeded!"
