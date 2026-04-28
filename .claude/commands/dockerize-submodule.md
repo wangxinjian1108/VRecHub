@@ -169,29 +169,19 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
             password: ${{ secrets.DOCKERHUB_TOKEN }}
         ```
      5. Login to ghcr.io — skip on PR (`secrets.GITHUB_TOKEN` always available)
-     6. `docker/metadata-action@v5` with images:
-        - `name=${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}`
-        - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
-     7. Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
-     8. `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR. **Important**: when Harbor push is enabled, add `load: true` so the built image is available locally for tagging.
-     9. **(If Harbor enabled)** Add these steps after build-push, skip on PR and when secret is empty:
+     6. **(If Harbor enabled)** Login to Zelos Harbor — skip on PR and when secret is empty:
         ```yaml
         - name: Login to Zelos Harbor
           if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
           env:
             HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
           run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
-
-        - name: Tag and push to Zelos Harbor
-          if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
-          env:
-            HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-          run: |
-            echo '${{ steps.meta.outputs.tags }}' | while IFS= read -r tag; do
-              [ -z "$tag" ] && continue
-              harbor_tag="harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>:${tag##*:}"
-              docker tag "$tag" "$harbor_tag"
-              docker push "$harbor_tag"
-            done
+        ```
+     7. `docker/metadata-action@v5` with images:
+        - `name=${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}`
+        - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
+        - **(If Harbor enabled)** `name=harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>,enable=${{ secrets.HARBOR_USERNAME != '' }}`
+     8. Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
+     9. `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR. Buildx pushes to all registries listed in metadata-action in one shot — do NOT use `docker tag` + `docker push` separately.
 
 5. **Report** — after writing both files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.
