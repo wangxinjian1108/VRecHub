@@ -55,12 +55,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to Zelos Harbor
-        if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
-        env:
-          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-        run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
-
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -68,7 +62,6 @@ jobs:
           images: |
             name=${{ secrets.DOCKERHUB_USERNAME }}/sam3,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
             ghcr.io/${{ github.repository_owner }}/sam3
-            name=harbor-volc.zelostech.com.cn:5443/zcloud_auto/sam3,enable=${{ secrets.HARBOR_USERNAME != '' }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
