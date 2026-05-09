@@ -75,7 +75,7 @@ RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
 # --- Model download ---
 RUN --mount=type=secret,id=hf_token \
     mkdir -p /opt/var/models/lingbot-map && \
-    hf download robbyant/lingbot-map \
+    hf download robbyant/lingbot-map lingbot-map-long.pt \
         --local-dir /opt/var/models/lingbot-map \
         --token $(cat /run/secrets/hf_token)
 
