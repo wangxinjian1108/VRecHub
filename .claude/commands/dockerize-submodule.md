@@ -120,7 +120,7 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
    - For HuggingFace models that require authentication, use BuildKit secret (token never baked into image layers):
      ```dockerfile
      RUN --mount=type=secret,id=hf_token \
-         huggingface-cli download <org>/<repo> <file> \
+         hf download <org>/<repo> <file> \
              --repo-type model --local-dir /opt/var/models/<model-name> \
              --token $(cat /run/secrets/hf_token)
      ```

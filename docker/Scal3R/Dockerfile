@@ -74,7 +74,7 @@ RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
 # --- Model download ---
 RUN --mount=type=secret,id=hf_token \
     mkdir -p /opt/var/models/scal3r && \
-    huggingface-cli download xbillowy/Scal3R scal3r.pt \
+    hf download xbillowy/Scal3R scal3r.pt \
         --repo-type model --local-dir /opt/var/models/scal3r \
         --token $(cat /run/secrets/hf_token)
 

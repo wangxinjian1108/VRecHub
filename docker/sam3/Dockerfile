@@ -74,7 +74,7 @@ RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
 # --- Model download ---
 RUN --mount=type=secret,id=hf_token \
     mkdir -p /opt/var/models/sam3 && \
-    huggingface-cli download facebook/sam3.1 \
+    hf download facebook/sam3.1 \
         --local-dir /opt/var/models/sam3 \
         --token $(cat /run/secrets/hf_token)
 
