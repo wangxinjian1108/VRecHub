@@ -113,19 +113,28 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
    - Read the submodule's README and install scripts to understand the correct install order (e.g. torch before requirements.txt). Use `conda run -n "${CONDA_ENV}"` for all pip/python commands
    - Install dependencies, then **remove source directories in the same `RUN` layer** to keep the image clean
 
-   **h. HuggingFace model download block**
-   - Always include this commented block after dependency installation:
+   **h. Model download**
+   - Read the README and docs to find all model/checkpoint downloads (HuggingFace, GitHub releases, direct URLs, etc.)
+   - If the repo mentions downloadable models, add **actual** (not commented) `RUN` steps to download them into `/opt/var/models/`
+   - All models go to `/opt/var/models/<model-name>` regardless of where the repo's README says to put them
+   - For HuggingFace models that require authentication, use BuildKit secret (token never baked into image layers):
      ```dockerfile
-     # --- HuggingFace model download ---
-     # For public models:
-     # RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('org/model-name', local_dir='/models/model-name')"
-     # For private models (token injected via BuildKit secret, never baked into the image):
-     # RUN --mount=type=secret,id=hf_token \
-     #     HF_TOKEN=$(cat /run/secrets/hf_token) python -c \
-     #     "from huggingface_hub import snapshot_download; snapshot_download('org/model-name', local_dir='/models/model-name', token=open('/run/secrets/hf_token').read().strip())"
-     # ----------------------------------
+     RUN --mount=type=secret,id=hf_token \
+         huggingface-cli download <org>/<repo> <file> \
+             --repo-type model --local-dir /opt/var/models/<model-name> \
+             --token $(cat /run/secrets/hf_token)
      ```
-   - If the README mentions specific checkpoints/models, add commented `RUN` lines for each one above the generic template
+   - For public downloads (GitHub releases, direct URLs):
+     ```dockerfile
+     RUN mkdir -p /opt/var/models/<model-name> && \
+         curl -L <url> -o /opt/var/models/<model-name>/<filename>
+     ```
+   - If any model uses HF secret, the workflow's `build-push-action` must include:
+     ```yaml
+     secrets: |
+       hf_token=${{ secrets.HF_TOKEN }}
+     ```
+   - If no models are mentioned in the README, skip this step entirely (do not add commented templates)
 
    **i. CMD / ENTRYPOINT**
    - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)

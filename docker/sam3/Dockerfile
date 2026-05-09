@@ -71,11 +71,11 @@ RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
         flash-attn-3 --no-deps --index-url https://download.pytorch.org/whl/cu128 \
     && rm -rf examples assets
 
-# --- HuggingFace model download ---
-# SAM 3 / SAM 3.1 checkpoints — gated model, requires HF auth:
-# RUN --mount=type=secret,id=hf_token \
-#     HF_TOKEN=$(cat /run/secrets/hf_token) python -c \
-#     "from huggingface_hub import snapshot_download; snapshot_download('facebook/sam3.1', local_dir='/models/sam3.1', token=open('/run/secrets/hf_token').read().strip())"
-# ----------------------------------
+# --- Model download ---
+RUN --mount=type=secret,id=hf_token \
+    mkdir -p /opt/var/models/sam3 && \
+    huggingface-cli download facebook/sam3.1 \
+        --local-dir /opt/var/models/sam3 \
+        --token $(cat /run/secrets/hf_token)
 
 CMD ["python", "-c", "import sam3; print(sam3.__version__)"]

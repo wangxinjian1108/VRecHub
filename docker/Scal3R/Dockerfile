@@ -71,25 +71,15 @@ RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
     && conda run -n "${CONDA_ENV}" pip install --no-cache-dir . \
     && rm -rf requirements.txt scripts assets docs
 
-# --- HuggingFace model download ---
-# scal3r.pt — xbillowy/Scal3R 私有模型，通过 BuildKit secret 注入 HF token：
-# RUN --mount=type=secret,id=hf_token \
-#     mkdir -p data/checkpoints && \
-#     HF_TOKEN=$(cat /run/secrets/hf_token) \
-#     huggingface-cli download xbillowy/Scal3R scal3r.pt \
-#         --repo-type model --local-dir data/checkpoints
-#
-# dino_salad.ckpt — 公开 GitHub release：
-# RUN mkdir -p data/checkpoints && \
-#     curl -L https://github.com/serizba/salad/releases/download/v1.0.0/dino_salad.ckpt \
-#         -o data/checkpoints/dino_salad.ckpt
-#
-# 其他公开模型：
-# RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('org/model-name', local_dir='/models/model-name')"
-# 其他私有模型：
-# RUN --mount=type=secret,id=hf_token \
-#     HF_TOKEN=$(cat /run/secrets/hf_token) python -c \
-#     "from huggingface_hub import snapshot_download; snapshot_download('org/model-name', local_dir='/models/model-name', token=open('/run/secrets/hf_token').read().strip())"
-# ----------------------------------
+# --- Model download ---
+RUN --mount=type=secret,id=hf_token \
+    mkdir -p /opt/var/models/scal3r && \
+    huggingface-cli download xbillowy/Scal3R scal3r.pt \
+        --repo-type model --local-dir /opt/var/models/scal3r \
+        --token $(cat /run/secrets/hf_token)
 
-CMD ["python", "-m", "scal3r.run", "--help"]
+RUN mkdir -p /opt/var/models/scal3r && \
+    curl -L https://github.com/serizba/salad/releases/download/v1.0.0/dino_salad.ckpt \
+        -o /opt/var/models/scal3r/dino_salad.ckpt
+
+CMD ["scal3r-run", "--help"]

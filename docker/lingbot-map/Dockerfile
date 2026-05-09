@@ -72,15 +72,15 @@ RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
     && conda run -n "${CONDA_ENV}" pip install --no-cache-dir onnxruntime-gpu \
     && rm -rf example assets lingbot-map_paper.pdf
 
-# --- HuggingFace model download ---
-# lingbot-map checkpoints — public model on robbyant/lingbot-map:
-# RUN python -c "from huggingface_hub import snapshot_download; snapshot_download('robbyant/lingbot-map', local_dir='/models/lingbot-map')"
-#
-# skyseg.onnx — auto-downloaded on first use when --mask_sky is passed,
-# or pre-download manually:
-# RUN mkdir -p /models/skyseg && \
-#     curl -L https://huggingface.co/JianyuanWang/skyseg/resolve/main/skyseg.onnx \
-#         -o /models/skyseg/skyseg.onnx
-# ----------------------------------
+# --- Model download ---
+RUN --mount=type=secret,id=hf_token \
+    mkdir -p /opt/var/models/lingbot-map && \
+    huggingface-cli download robbyant/lingbot-map \
+        --local-dir /opt/var/models/lingbot-map \
+        --token $(cat /run/secrets/hf_token)
 
-CMD ["python", "demo.py", "--help"]
+RUN mkdir -p /opt/var/models/skyseg && \
+    curl -L https://huggingface.co/JianyuanWang/skyseg/resolve/main/skyseg.onnx \
+        -o /opt/var/models/skyseg/skyseg.onnx
+
+CMD ["python", "-c", "import lingbot_map; print('ready')"]
