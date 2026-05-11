@@ -13,3 +13,9 @@
 [submodule "thirdparty/vggt"]
 	path = thirdparty/vggt
 	url = git@github.com:wangxinjian1108/vggt.git
+[submodule "thirdparty/ZipMap"]
+	path = thirdparty/ZipMap
+	url = git@github.com:wangxinjian1108/ZipMap.git
+[submodule "thirdparty/Pi3"]
+	path = thirdparty/Pi3
+	url = git@github.com:wangxinjian1108/Pi3.git
