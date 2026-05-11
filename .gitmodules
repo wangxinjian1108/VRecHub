@@ -7,3 +7,6 @@
 [submodule "thirdparty/sam3"]
 	path = thirdparty/sam3
 	url = git@github.com:wangxinjian1108/sam3.git
+[submodule "thirdparty/LoGeR"]
+	path = thirdparty/LoGeR
+	url = git@github.com:wangxinjian1108/LoGeR.git
