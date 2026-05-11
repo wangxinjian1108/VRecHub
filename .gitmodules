@@ -10,3 +10,6 @@
 [submodule "thirdparty/LoGeR"]
 	path = thirdparty/LoGeR
 	url = git@github.com:wangxinjian1108/LoGeR.git
+[submodule "thirdparty/vggt"]
+	path = thirdparty/vggt
+	url = git@github.com:wangxinjian1108/vggt.git
