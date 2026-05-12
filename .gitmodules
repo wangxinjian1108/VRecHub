@@ -19,3 +19,15 @@
 [submodule "thirdparty/Pi3"]
 	path = thirdparty/Pi3
 	url = git@github.com:wangxinjian1108/Pi3.git
+[submodule "thirdparty/Pi-Long"]
+	path = thirdparty/Pi-Long
+	url = git@github.com:DengKaiCQ/Pi-Long.git
+[submodule "thirdparty/VGGT-Long"]
+	path = thirdparty/VGGT-Long
+	url = git@github.com:DengKaiCQ/VGGT-Long.git
+[submodule "thirdparty/StreamVGGT"]
+	path = thirdparty/StreamVGGT
+	url = git@github.com:wzzheng/StreamVGGT.git
+[submodule "thirdparty/map-anything"]
+	path = thirdparty/map-anything
+	url = git@github.com:facebookresearch/map-anything.git
