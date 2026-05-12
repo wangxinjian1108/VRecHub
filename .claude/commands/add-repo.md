@@ -34,4 +34,9 @@ Add a git repo as a submodule, dockerize it, create a GitHub Actions workflow, c
      d. Wait for new run
    - After 3 failed attempts, stop and report what's broken
 
-5. **Report** — one sentence: workflow status and image name (e.g. `ghcr.io/wangxinjian1108/<repo-name>:latest`)
+5. **Update image list** — invoke the `/list-images` skill to regenerate `IMAGES.md` with the new image included. Then stage and amend the last commit:
+   ```
+   git add IMAGES.md && git commit --amend --no-edit && git push --force-with-lease
+   ```
+
+6. **Report** — one sentence: workflow status and image name (e.g. `ghcr.io/wangxinjian1108/<repo-name>:latest`)
