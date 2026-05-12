@@ -31,3 +31,6 @@
 [submodule "thirdparty/map-anything"]
 	path = thirdparty/map-anything
 	url = git@github.com:facebookresearch/map-anything.git
+[submodule "thirdparty/FoundationStereo"]
+	path = thirdparty/FoundationStereo
+	url = git@github.com:NVlabs/FoundationStereo.git
