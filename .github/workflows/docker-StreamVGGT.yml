@@ -1,19 +1,19 @@
-name: Docker – VGGT-Long
+name: Docker – StreamVGGT
 
 on:
   push:
     branches: [master]
     tags: ["v*.*.*"]
     paths:
-      - "docker/VGGT-Long/**"
-      - "thirdparty/VGGT-Long"
-      - ".github/workflows/docker-VGGT-Long.yml"
+      - "docker/StreamVGGT/**"
+      - "thirdparty/StreamVGGT"
+      - ".github/workflows/docker-StreamVGGT.yml"
   pull_request:
     branches: [master]
     paths:
-      - "docker/VGGT-Long/**"
-      - "thirdparty/VGGT-Long"
-      - ".github/workflows/docker-VGGT-Long.yml"
+      - "docker/StreamVGGT/**"
+      - "thirdparty/StreamVGGT"
+      - ".github/workflows/docker-StreamVGGT.yml"
   workflow_dispatch:
 
 jobs:
@@ -62,8 +62,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            name=${{ secrets.DOCKERHUB_USERNAME }}/vggt-long,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
-            ghcr.io/${{ github.repository_owner }}/vggt-long
+            name=${{ secrets.DOCKERHUB_USERNAME }}/StreamVGGT,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
+            ghcr.io/${{ github.repository_owner }}/StreamVGGT
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -75,7 +75,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/VGGT-Long/Dockerfile
+          file: docker/StreamVGGT/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

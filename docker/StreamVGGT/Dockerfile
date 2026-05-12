@@ -1,13 +1,13 @@
-FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     CONDA_DIR=/opt/conda \
-    CONDA_ENV=pi-long
+    CONDA_ENV=StreamVGGT
 
-WORKDIR /Pi-Long
+WORKDIR /StreamVGGT
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -47,8 +47,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pciutils \
     libgl1 \
     libglib2.0-0 \
-    libopencv-dev \
-    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
@@ -56,21 +54,22 @@ RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-la
     && rm -f /tmp/miniconda.sh \
     && "${CONDA_DIR}/bin/conda" tos accept --channel https://repo.anaconda.com/pkgs/main \
     && "${CONDA_DIR}/bin/conda" tos accept --channel https://repo.anaconda.com/pkgs/r \
-    && "${CONDA_DIR}/bin/conda" create -n "${CONDA_ENV}" python=3.10 -y \
+    && "${CONDA_DIR}/bin/conda" create -n "${CONDA_ENV}" python=3.11 cmake=3.14.0 -y \
     && "${CONDA_DIR}/bin/conda" clean -afy
 
 RUN mkdir -p /var/run/sshd /root/.ssh && ssh-keygen -A
 
 ENV PATH=${CONDA_DIR}/envs/${CONDA_ENV}/bin:${CONDA_DIR}/bin:${PATH}
 
-COPY thirdparty/Pi-Long .
+COPY thirdparty/StreamVGGT .
 
 RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
-        torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu118 \
+        torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu121 \
     && conda run -n "${CONDA_ENV}" pip install --no-cache-dir -r requirements.txt \
-    && conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
-        torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu118 \
-    && conda run -n "${CONDA_ENV}" pip install --no-cache-dir --no-build-isolation . \
+    && conda run -n "${CONDA_ENV}" conda install -n "${CONDA_ENV}" 'llvm-openmp<16' -y \
     && rm -rf assets
 
-CMD ["python", "pi_long.py", "--help"]
+RUN mkdir -p /opt/var/models/StreamVGGT && \
+    wget -O /opt/var/models/StreamVGGT/model.pt "https://huggingface.co/facebook/VGGT-1B/resolve/main/model.pt"
+
+CMD ["python", "demo_gradio.py"]

@@ -82,9 +82,6 @@ RUN mkdir -p weights \
     && tar -xzf weights/ORBvoc.txt.tar.gz -C weights/ \
     && rm weights/ORBvoc.txt.tar.gz
 
-RUN --mount=type=secret,id=hf_token \
-    conda run -n "${CONDA_ENV}" huggingface-cli download facebook/VGGT-1B model.pt \
-    --token $(cat /run/secrets/hf_token) \
-    --local-dir weights/ --local-dir-use-symlinks False
+RUN curl -L "https://huggingface.co/facebook/VGGT-1B/resolve/main/model.pt" -o weights/model.pt
 
 CMD ["conda", "run", "-n", "vggt-long", "python", "vggt_long.py"]
