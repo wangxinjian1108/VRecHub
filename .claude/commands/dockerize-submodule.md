@@ -162,6 +162,8 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
         - name: Free disk space
           run: |
             sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+            sudo rm -rf /usr/share/swift /usr/local/graalvm /usr/local/.ghcup
+            sudo rm -rf /usr/local/share/powershell /usr/local/share/chromium
             sudo docker image prune -af
             df -h
         ```
