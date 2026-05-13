@@ -40,6 +40,7 @@ RUN pip install --no-cache-dir \
         torch==2.0.1 torchvision==0.15.2 --index-url https://download.pytorch.org/whl/cu118
 
 RUN pip install --no-cache-dir \
+        "numpy<2" \
         plyfile tqdm joblib exif scikit-learn opencv-python==4.9.0.80 matplotlib \
         timm==0.4.5 lpips tensorboard
 
