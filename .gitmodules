@@ -34,3 +34,6 @@
 [submodule "thirdparty/FoundationStereo"]
 	path = thirdparty/FoundationStereo
 	url = git@github.com:wangxinjian1108/FoundationStereo.git
+[submodule "thirdparty/hierarchical-3d-gaussians"]
+	path = thirdparty/hierarchical-3d-gaussians
+	url = https://github.com/graphdeco-inria/hierarchical-3d-gaussians.git
