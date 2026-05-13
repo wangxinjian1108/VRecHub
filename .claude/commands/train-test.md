@@ -72,7 +72,7 @@ Examples:
   ```
 - If a prep script fails, diagnose and fix it on the dev branch, then retry (up to 3 attempts per dataset).
 
-### 5. Closed-loop Training Test (with Dockerfile Update Loop)
+### 5. Closed-loop Training Test (with Local Debug → Dockerfile Update → CI/CD Rebuild)
 
 **5a. Create training config for test**
 - Read the model's existing training config and entry point.
@@ -92,30 +92,70 @@ docker run --rm --gpus all --shm-size=4gb \
 ```
 - The training command depends on the model (e.g. for vggt: `python training/launch.py --config train_test`)
 
-**5c. Evaluate result and handle missing dependencies**
+**5c. Evaluate result and handle missing dependencies (Local Debug Loop)**
 - Success = 1 full epoch completes without error (training + validation if applicable).
 - If training fails with `ModuleNotFoundError` or `ImportError`:
+  
+  **Phase 1: Local Debug (Fast Iteration)**
   a. **Identify missing packages**: Parse error output to extract package names
-  b. **Update Dockerfile**: 
+  b. **Create debug container** with interactive shell:
+     ```bash
+     docker run -it --gpus all --shm-size=4gb \
+       -v <data-path>:/data \
+       -v $(pwd)/thirdparty/<model>:/workspace \
+       ghcr.io/wangxinjian1108/<model>:latest \
+       bash
+     ```
+  c. **Install missing packages** inside container:
+     - For conda-based images: `conda install -c conda-forge <package> -y`
+     - For pip-based: `pip install <package>`
+     - Test that training now works
+  d. **Commit debug changes** to a temporary image:
+     ```bash
+     docker commit <container-id> ghcr.io/wangxinjian1108/<model>:debug
+     ```
+  e. **Verify training works** with debug image:
+     ```bash
+     docker run --rm --gpus all --shm-size=4gb \
+       -v <data-path>:/data \
+       -v $(pwd)/thirdparty/<model>:/workspace \
+       ghcr.io/wangxinjian1108/<model>:debug \
+       bash -c "cd /workspace && <training-command-with-test-config>"
+     ```
+  f. **If training succeeds**, proceed to Phase 2. If fails, go back to step c.
+  
+  **Phase 2: Formalize Dockerfile (After Debug Success)**
+  a. **Update Dockerfile**:
      - Locate `docker/<model>/Dockerfile`
      - Add missing packages to the appropriate pip/conda install command
      - Document which packages were added and why
-  c. **Update GitHub Actions workflow**:
+  b. **Update GitHub Actions workflow**:
      - Locate `.github/workflows/docker-<model>.yml`
      - Ensure workflow is configured to rebuild on changes
-  d. **Commit and push to master**:
-     - `cd thirdparty/<model> && git add -A && git commit -m "fix: add training dependencies"`
-     - `git push origin dev` (or merge to master if ready)
+  c. **Commit and push to master**:
      - Return to repo root
      - `git add docker/<model>/Dockerfile .github/workflows/docker-<model>.yml`
-     - `git commit -m "chore: update Dockerfile and workflow with training dependencies"`
+     - `git commit -m "chore: update Dockerfile with training dependencies"`
      - `git push origin master`
-  e. **Trigger image rebuild**:
+  d. **Trigger image rebuild**:
      - Run: `gh workflow run docker-<model>.yml`
      - Wait for workflow to complete (check with `gh run list`)
-  f. **Pull new image**:
-     - `docker pull ghcr.io/wangxinjian1108/<model>:latest`
-  g. **Retry training** with new image (go back to 5b, up to 3 total attempts)
+  
+  **Phase 3: Verify CI/CD Built Image (Final Validation)**
+  a. **Pull newly built image**:
+     ```bash
+     docker pull ghcr.io/wangxinjian1108/<model>:latest
+     ```
+  b. **Run training with new image** to confirm CI/CD build is correct:
+     ```bash
+     docker run --rm --gpus all --shm-size=4gb \
+       -v <data-path>:/data \
+       -v $(pwd)/thirdparty/<model>:/workspace \
+       ghcr.io/wangxinjian1108/<model>:latest \
+       bash -c "cd /workspace && <training-command-with-test-config>"
+     ```
+  c. **If successful**, proceed to step 6. If fails, debug and go back to Phase 2.
+
 - If training fails with other errors (OOM, data format, config):
   a. Capture and analyze the error output
   b. Fix the issue in the dev branch code (data loading, config, compatibility, etc.)
@@ -125,7 +165,7 @@ docker run --rm --gpus all --shm-size=4gb \
 
 ### 6. Commit Dev Branch Changes
 
-After successful training:
+After successful training (with CI/CD built image):
 - `cd thirdparty/<model>`
 - Stage all new/modified files:
   ```
@@ -149,5 +189,6 @@ One paragraph summary:
 - Which datasets were processed and their sizes
 - Training result: success (1 epoch completed) or failure (what broke)
 - What was committed to the dev branch
-- If Dockerfile was updated: which dependencies were added and why
+- If Dockerfile was updated: which dependencies were added and why (with rationale)
+- Confirmation that training works with both debug image and CI/CD built image
 - Any issues that need manual attention
