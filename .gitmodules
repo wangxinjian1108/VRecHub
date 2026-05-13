@@ -21,16 +21,16 @@
 	url = git@github.com:wangxinjian1108/Pi3.git
 [submodule "thirdparty/Pi-Long"]
 	path = thirdparty/Pi-Long
-	url = git@github.com:DengKaiCQ/Pi-Long.git
+	url = git@github.com:wangxinjian1108/Pi-Long.git
 [submodule "thirdparty/VGGT-Long"]
 	path = thirdparty/VGGT-Long
-	url = git@github.com:DengKaiCQ/VGGT-Long.git
+	url = git@github.com:wangxinjian1108/VGGT-Long.git
 [submodule "thirdparty/StreamVGGT"]
 	path = thirdparty/StreamVGGT
-	url = git@github.com:wzzheng/StreamVGGT.git
+	url = git@github.com:wangxinjian1108/StreamVGGT.git
 [submodule "thirdparty/map-anything"]
 	path = thirdparty/map-anything
-	url = git@github.com:facebookresearch/map-anything.git
+	url = git@github.com:wangxinjian1108/map-anything.git
 [submodule "thirdparty/FoundationStereo"]
 	path = thirdparty/FoundationStereo
-	url = git@github.com:NVlabs/FoundationStereo.git
+	url = git@github.com:wangxinjian1108/FoundationStereo.git
