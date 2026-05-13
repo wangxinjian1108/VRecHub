@@ -67,6 +67,7 @@ COPY thirdparty/vggt .
 RUN conda run -n "${CONDA_ENV}" pip install --no-cache-dir \
         torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu121 \
     && conda run -n "${CONDA_ENV}" pip install --no-cache-dir -e ".[demo]" \
+    && conda install -n "${CONDA_ENV}" -c conda-forge iopath wcmatch fvcore tensorboard -y \
     && rm -rf assets
 
 # --- Model download ---
