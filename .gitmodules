@@ -37,3 +37,6 @@
 [submodule "thirdparty/hierarchical-3d-gaussians"]
 	path = thirdparty/hierarchical-3d-gaussians
 	url = https://github.com/graphdeco-inria/hierarchical-3d-gaussians.git
+[submodule "thirdparty/colmap"]
+	path = thirdparty/colmap
+	url = https://github.com/colmap/colmap.git

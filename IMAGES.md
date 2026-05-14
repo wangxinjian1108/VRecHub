@@ -3,6 +3,7 @@
 | 项目 | Docker 镜像 | CUDA | PyTorch | 论文 | 描述 |
 |------|------------|------|---------|------|------|
 | FoundationStereo | `ghcr.io/wangxinjian1108/foundationstereo` | 12.4 | 2.4.1 | [arXiv:2501.09898](https://arxiv.org/abs/2501.09898) | 立体匹配基础模型，CVPR 2025 Oral (Best Paper Nomination) |
+| colmap | `ghcr.io/wangxinjian1108/colmap` | 12.6 | latest | [CVPR 2016](https://demuc.de/papers/schoenberger2016sfm.pdf) | Structure-from-Motion 和 Multi-View Stereo 管道 |
 | hierarchical-3d-gaussians | `ghcr.io/wangxinjian1108/hierarchical-3d-gaussians` | 11.8 | 2.0.1 | [SIGGRAPH 2024](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/) | 层次化 3D 高斯表示，超大规模场景实时渲染 |
 | lingbot-map | `ghcr.io/wangxinjian1108/lingbot-map` | 12.8 | 2.8.0 | [arXiv:2604.14141](https://arxiv.org/abs/2604.14141) | 语言引导的建图方法 |
 | LoGeR | `ghcr.io/wangxinjian1108/loger` | 12.6 | 2.6.0 | [arXiv:2603.03269](https://arxiv.org/abs/2603.03269) | 长上下文几何重建，混合记忆机制 |
@@ -16,4 +17,4 @@
 | VGGT-Long | `ghcr.io/wangxinjian1108/vggt-long` | 11.8 | 2.5.1 | [arXiv:2507.16443](https://arxiv.org/abs/2507.16443) | 将 VGGT 扩展到公里级长 RGB 序列 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 13 个镜像，12 篇独立论文。
+共 14 个镜像，13 篇独立论文。
