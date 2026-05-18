@@ -39,7 +39,7 @@
 	url = https://github.com/graphdeco-inria/hierarchical-3d-gaussians.git
 [submodule "thirdparty/colmap"]
 	path = thirdparty/colmap
-	url = https://github.com/colmap/colmap.git
+	url = git@github.com:wangxinjian1108/colmap.git
 [submodule "thirdparty/vggt-omega"]
 	path = thirdparty/vggt-omega
 	url = git@github.com:wangxinjian1108/vggt-omega.git
