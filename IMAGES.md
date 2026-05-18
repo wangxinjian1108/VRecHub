@@ -15,6 +15,7 @@
 | StreamVGGT | `ghcr.io/wangxinjian1108/streamvggt` | 12.1 | 2.3.1 | [arXiv:2507.11539](https://arxiv.org/abs/2507.11539) | 实时流式 4D 视觉几何感知 |
 | vggt | `ghcr.io/wangxinjian1108/vggt` | 12.1 | 2.3.1 | [arXiv:2503.11651](https://arxiv.org/abs/2503.11651) | Visual Geometry Grounded Transformer (Oxford VGG + Meta AI) |
 | VGGT-Long | `ghcr.io/wangxinjian1108/vggt-long` | 11.8 | 2.5.1 | [arXiv:2507.16443](https://arxiv.org/abs/2507.16443) | 将 VGGT 扩展到公里级长 RGB 序列 |
+| vggt-omega | `ghcr.io/wangxinjian1108/vggt-omega` | 12.6 | 2.6.0 | [arXiv:2605.15195](https://arxiv.org/abs/2605.15195) | VGGT-Ω：前馈式相机与深度重建 (Oxford VGG + Meta AI), CVPR 2026 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 14 个镜像，13 篇独立论文。
+共 15 个镜像，14 篇独立论文。
