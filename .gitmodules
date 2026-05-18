@@ -40,3 +40,6 @@
 [submodule "thirdparty/colmap"]
 	path = thirdparty/colmap
 	url = https://github.com/colmap/colmap.git
+[submodule "thirdparty/vggt-omega"]
+	path = thirdparty/vggt-omega
+	url = git@github.com:wangxinjian1108/vggt-omega.git
