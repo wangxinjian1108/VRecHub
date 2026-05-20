@@ -45,11 +45,13 @@ Use this skill when the user wants the full onboarding flow for a new model repo
 
 - Build context must be the repo root
 - Copy source from local submodules, never `git clone` during image build
-- Prefer the existing `docker/vggt/Dockerfile` and other nearby model Dockerfiles as style references
-- Prefer the existing `.github/workflows/docker-*.yml` files as workflow references
-- In the same workflow, build the runtime image first, tag it with a local runtime tag, build `ghcr.io/wangxinjian1108/<repo-name>:dev` from that local runtime tag, then push the runtime and dev tags
-- After pushing the runtime tags and before building the dev image, free runner disk: `docker image prune -af --filter "label!=local-runtime"` (or equivalent — remove every local image except the `<repo-name>:runtime-<shortsha>` tag and any layers buildx still needs). The dual-build pattern keeps the full runtime image in the local daemon for `--build-arg BASE_IMAGE=`, so on GitHub-hosted runners (~14 GB free) the dev export step will OOM-disk without this prune.
-- Do not create a separate `<repo-name>-dev` image repository
+- Prefer the existing `docker/vggt-omega/Dockerfile` and other nearby model Dockerfiles as style references
+- Prefer `.github/workflows/docker-vggt-omega.yml` as the workflow reference (latest dual-build pattern)
+- In the same workflow, build the runtime image with `docker/build-push-action@v6` using `push: ${{ github.event_name != 'pull_request' }}` — the runtime is streamed straight to GHCR with no local `load`. Include `ghcr.io/wangxinjian1108/<repo-name>:sha-<short>` in the tag list so the dev step has a stable remote tag to pull from.
+- Build the dev image with a second `docker/build-push-action@v6` step, gated on `if: github.event_name != 'pull_request'`. Pass `build-args: BASE_IMAGE=ghcr.io/wangxinjian1108/<repo-name>:sha-<short>` so buildx pulls the just-pushed runtime layers on demand. Use a separate cache scope (e.g. `cache-to: type=gha,mode=max,scope=dev`) so runtime and dev caches don't clobber each other.
+- Do **not** use `load: true` on the runtime build. `load` writes the full image as a tarball to local docker, which OOM-disks GitHub-hosted runners (~14 GB free) on any model image bigger than ~10 GB (CUDA-devel base + torch + weights are usually enough on their own).
+- On pull requests, the dev step is skipped (no pushed runtime to pull from); CI only verifies the runtime build. Document this trade-off; if PR-time dev validation is required, build runtime with `outputs: type=cacheonly` and dev with the same cache, but expect longer CI.
+- Do not create a separate `<repo-name>-dev` image repository — use the same GHCR repo with the `:dev` tag
 
 ## Done criteria
 

@@ -75,49 +75,21 @@ jobs:
         id: runtime-base
         run: |
           echo "remote=ghcr.io/${{ github.repository_owner }}/vggt-omega:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-          echo "local=vggt-omega:runtime-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Build runtime image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/vggt-omega/Dockerfile
-          load: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ steps.meta.outputs.tags }}
             ${{ steps.runtime-base.outputs.remote }}
-            ${{ steps.runtime-base.outputs.local }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secrets: |
             hf_token=${{ secrets.HF_TOKEN }}
-
-      - name: Push runtime image tags
-        if: github.event_name != 'pull_request'
-        run: |
-          declare -A seen=()
-          while IFS= read -r tag; do
-            [ -n "${tag}" ] || continue
-            if [ -z "${seen[$tag]+x}" ]; then
-              seen[$tag]=1
-              docker push "${tag}"
-            fi
-          done <<'EOF'
-          ${{ steps.meta.outputs.tags }}
-          ${{ steps.runtime-base.outputs.remote }}
-          EOF
-
-      - name: Free disk before dev build
-        run: |
-          df -h
-          LOCAL_TAG='${{ steps.runtime-base.outputs.local }}'
-          docker images --format '{{.Repository}}:{{.Tag}}' \
-            | grep -v "^${LOCAL_TAG}$" \
-            | xargs -r docker rmi 2>/dev/null || true
-          docker image prune -f
-          docker builder prune -af --filter "until=24h"
-          df -h
 
       - name: Docker metadata for dev image
         id: meta-dev
@@ -130,46 +102,16 @@ jobs:
             type=raw,value=dev
             type=sha,prefix=dev-sha-,format=short
 
-      - name: Select dev base image
-        id: dev-base
-        run: |
-          echo "image=${{ steps.runtime-base.outputs.local }}" >> "$GITHUB_OUTPUT"
-
       - name: Build dev image
-        run: |
-          tag_args=()
-          while IFS= read -r tag; do
-            [ -n "${tag}" ] || continue
-            tag_args+=(--tag "${tag}")
-          done <<'EOF'
-          ${{ steps.meta-dev.outputs.tags }}
-          EOF
-
-          label_args=()
-          while IFS= read -r label; do
-            [ -n "${label}" ] || continue
-            label_args+=(--label "${label}")
-          done <<'EOF'
-          ${{ steps.meta-dev.outputs.labels }}
-          EOF
-
-          docker build \
-            "${tag_args[@]}" \
-            "${label_args[@]}" \
-            --build-arg BASE_IMAGE="${{ steps.dev-base.outputs.image }}" \
-            -f docker/vggt-omega/Dockerfile.dev \
-            .
-
-      - name: Push dev image tags
         if: github.event_name != 'pull_request'
-        run: |
-          declare -A seen=()
-          while IFS= read -r tag; do
-            [ -n "${tag}" ] || continue
-            if [ -z "${seen[$tag]+x}" ]; then
-              seen[$tag]=1
-              docker push "${tag}"
-            fi
-          done <<'EOF'
-          ${{ steps.meta-dev.outputs.tags }}
-          EOF
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/vggt-omega/Dockerfile.dev
+          push: true
+          build-args: |
+            BASE_IMAGE=${{ steps.runtime-base.outputs.remote }}
+          tags: ${{ steps.meta-dev.outputs.tags }}
+          labels: ${{ steps.meta-dev.outputs.labels }}
+          cache-from: type=gha,scope=dev
+          cache-to: type=gha,mode=max,scope=dev
