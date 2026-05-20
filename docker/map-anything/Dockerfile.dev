@@ -47,11 +47,15 @@ RUN mkdir -p /var/run/sshd && \
         echo "root:${ROOT_PASSWORD}" | chpasswd; \
     fi
 
-# Notebook user
+# Notebook user (robust to base images that already own NB_UID)
 RUN if ! getent group "${NB_GID}" >/dev/null; then \
         groupadd -g "${NB_GID}" "${NB_USER}"; \
     fi && \
-    if ! id -u "${NB_USER}" >/dev/null 2>&1; then \
+    existing_user=$(getent passwd "${NB_UID}" | cut -d: -f1 || true) && \
+    if [ -n "$existing_user" ] && [ "$existing_user" != "${NB_USER}" ]; then \
+        usermod -l "${NB_USER}" -d "${WORK_DIR}" -m "$existing_user" 2>/dev/null || true; \
+        usermod -g "${NB_GID}" "${NB_USER}" 2>/dev/null || true; \
+    elif ! id -u "${NB_USER}" >/dev/null 2>&1; then \
         useradd -m -s /bin/bash -u "${NB_UID}" -g "${NB_GID}" "${NB_USER}"; \
     fi && \
     mkdir -p "${WORK_DIR}" && \

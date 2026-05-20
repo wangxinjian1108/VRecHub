@@ -74,7 +74,7 @@ jobs:
       - name: Set runtime base tag for dev image
         id: runtime-base
         run: |
-          echo "remote=ghcr.io/${{ github.repository_owner }}/FoundationStereo:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "remote=ghcr.io/${{ github.repository_owner }}/foundationstereo:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Build runtime image
         uses: docker/build-push-action@v6
