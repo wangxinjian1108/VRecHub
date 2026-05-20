@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dev Image"
+  short_description: "Generate a Notebook-ready dev image"
+  default_prompt: "Use $dev-image to create a Kubernetes Notebook dev image with sshd, JupyterLab, s6, and NB_PREFIX support."

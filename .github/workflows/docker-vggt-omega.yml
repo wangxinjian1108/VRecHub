@@ -71,15 +71,94 @@ jobs:
             type=sha,prefix=sha-,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push
+      - name: Set runtime base tag for dev image
+        id: runtime-base
+        run: |
+          echo "remote=ghcr.io/${{ github.repository_owner }}/vggt-omega:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "local=vggt-omega:runtime-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build runtime image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/vggt-omega/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          load: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.runtime-base.outputs.remote }}
+            ${{ steps.runtime-base.outputs.local }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           secrets: |
             hf_token=${{ secrets.HF_TOKEN }}
+
+      - name: Push runtime image tags
+        if: github.event_name != 'pull_request'
+        run: |
+          declare -A seen=()
+          while IFS= read -r tag; do
+            [ -n "${tag}" ] || continue
+            if [ -z "${seen[$tag]+x}" ]; then
+              seen[$tag]=1
+              docker push "${tag}"
+            fi
+          done <<'EOF'
+          ${{ steps.meta.outputs.tags }}
+          ${{ steps.runtime-base.outputs.remote }}
+          EOF
+
+      - name: Docker metadata for dev image
+        id: meta-dev
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            name=${{ secrets.DOCKERHUB_USERNAME }}/vggt-omega,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
+            ghcr.io/${{ github.repository_owner }}/vggt-omega
+          tags: |
+            type=raw,value=dev
+            type=sha,prefix=dev-sha-,format=short
+
+      - name: Select dev base image
+        id: dev-base
+        run: |
+          echo "image=${{ steps.runtime-base.outputs.local }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build dev image
+        run: |
+          tag_args=()
+          while IFS= read -r tag; do
+            [ -n "${tag}" ] || continue
+            tag_args+=(--tag "${tag}")
+          done <<'EOF'
+          ${{ steps.meta-dev.outputs.tags }}
+          EOF
+
+          label_args=()
+          while IFS= read -r label; do
+            [ -n "${label}" ] || continue
+            label_args+=(--label "${label}")
+          done <<'EOF'
+          ${{ steps.meta-dev.outputs.labels }}
+          EOF
+
+          docker build \
+            "${tag_args[@]}" \
+            "${label_args[@]}" \
+            --build-arg BASE_IMAGE="${{ steps.dev-base.outputs.image }}" \
+            -f docker/vggt-omega/Dockerfile.dev \
+            .
+
+      - name: Push dev image tags
+        if: github.event_name != 'pull_request'
+        run: |
+          declare -A seen=()
+          while IFS= read -r tag; do
+            [ -n "${tag}" ] || continue
+            if [ -z "${seen[$tag]+x}" ]; then
+              seen[$tag]=1
+              docker push "${tag}"
+            fi
+          done <<'EOF'
+          ${{ steps.meta-dev.outputs.tags }}
+          EOF

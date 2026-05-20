@@ -9,24 +9,25 @@ Use this skill when the user asks to regenerate `IMAGES.md`.
 
 ## Workflow
 
-1. Scan `.github/workflows/docker-*.yml` to identify all published image names.
-2. For each image, inspect `docker/<name>/Dockerfile` and extract:
+1. Scan `.github/workflows/docker-*.yml` to identify all published runtime image names.
+2. Ignore dev-image workflows such as `docker-<name>-dev.yml` unless the user explicitly asks for a dev image catalog.
+3. For each image, inspect `docker/<name>/Dockerfile` and extract:
    - CUDA version from `FROM`
    - PyTorch version if pinned, otherwise mark `latest` or `unspecified`
-3. Inspect the corresponding submodule README under `thirdparty/<name>` and extract:
+4. Inspect the corresponding submodule README under `thirdparty/<name>` and extract:
    - paper title
    - arXiv or PDF link
    - a short description
-4. Generate `IMAGES.md` as a table with columns:
+5. Generate `IMAGES.md` as a table with columns:
    - 项目
    - Docker 镜像
    - CUDA
    - PyTorch
    - 论文
    - 描述
-5. Sort rows by project name unless the repo already uses another stable order.
-6. If a project has no standalone paper, state that plainly in the paper column.
-7. Add a final count line such as `共 N 个镜像`.
+6. Sort rows by project name unless the repo already uses another stable order.
+7. If a project has no standalone paper, state that plainly in the paper column.
+8. Add a final count line such as `共 N 个镜像`.
 
 ## Guardrails
 
