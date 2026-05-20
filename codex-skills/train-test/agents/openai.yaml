@@ -1,0 +1,5 @@
+interface:
+  display_name: "Train Test"
+  short_description: "Validate one model training pipeline in Docker"
+  default_prompt: "Use $train-test to verify one model can preprocess data and finish a 1-epoch training run in its published image."
+

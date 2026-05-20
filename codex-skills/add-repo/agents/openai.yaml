@@ -1,0 +1,5 @@
+interface:
+  display_name: "Add Repo"
+  short_description: "Add a submodule and ship its image pipeline"
+  default_prompt: "Use $add-repo to add a new model repo, dockerize it, update IMAGES.md, and monitor CI."
+
