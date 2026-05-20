@@ -108,6 +108,17 @@ jobs:
           ${{ steps.runtime-base.outputs.remote }}
           EOF
 
+      - name: Free disk before dev build
+        run: |
+          df -h
+          LOCAL_TAG='${{ steps.runtime-base.outputs.local }}'
+          docker images --format '{{.Repository}}:{{.Tag}}' \
+            | grep -v "^${LOCAL_TAG}$" \
+            | xargs -r docker rmi 2>/dev/null || true
+          docker image prune -f
+          docker builder prune -af --filter "until=24h"
+          df -h
+
       - name: Docker metadata for dev image
         id: meta-dev
         uses: docker/metadata-action@v5

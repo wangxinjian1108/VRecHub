@@ -48,6 +48,7 @@ Use this skill when the user wants the full onboarding flow for a new model repo
 - Prefer the existing `docker/vggt/Dockerfile` and other nearby model Dockerfiles as style references
 - Prefer the existing `.github/workflows/docker-*.yml` files as workflow references
 - In the same workflow, build the runtime image first, tag it with a local runtime tag, build `ghcr.io/wangxinjian1108/<repo-name>:dev` from that local runtime tag, then push the runtime and dev tags
+- After pushing the runtime tags and before building the dev image, free runner disk: `docker image prune -af --filter "label!=local-runtime"` (or equivalent — remove every local image except the `<repo-name>:runtime-<shortsha>` tag and any layers buildx still needs). The dual-build pattern keeps the full runtime image in the local daemon for `--build-arg BASE_IMAGE=`, so on GitHub-hosted runners (~14 GB free) the dev export step will OOM-disk without this prune.
 - Do not create a separate `<repo-name>-dev` image repository
 
 ## Done criteria

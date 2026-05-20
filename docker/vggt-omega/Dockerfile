@@ -78,9 +78,6 @@ RUN --mount=type=secret,id=hf_token \
     && mkdir -p /opt/var/models/vggt-omega \
     && conda run -n "${CONDA_ENV}" hf download facebook/VGGT-Omega vggt_omega_1b_512.pt \
          --repo-type model --local-dir /opt/var/models/vggt-omega \
-         --token $(cat /run/secrets/hf_token) \
-    && conda run -n "${CONDA_ENV}" hf download facebook/VGGT-Omega vggt_omega_1b_256_text.pt \
-         --repo-type model --local-dir /opt/var/models/vggt-omega \
          --token $(cat /run/secrets/hf_token)
 
 CMD ["python", "-c", "from vggt_omega.models import VGGTOmega; print('ready')"]
