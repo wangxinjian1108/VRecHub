@@ -1,0 +1,104 @@
+ARG BASE_IMAGE=ghcr.io/wangxinjian1108/Scal3R:latest
+FROM ${BASE_IMAGE}
+
+ARG S6_OVERLAY_VERSION=3.2.0.2
+ARG JUPYTER_PORT=8888
+ARG SSH_PORT=22
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ARG NB_GID=100
+ARG WORK_DIR=/home/${NB_USER}
+ARG ROOT_PASSWORD=ShARC
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    NB_USER=${NB_USER} \
+    NB_UID=${NB_UID} \
+    NB_GID=${NB_GID} \
+    HOME=${WORK_DIR} \
+    JUPYTER_PORT=${JUPYTER_PORT} \
+    SSH_PORT=${SSH_PORT} \
+    NB_PREFIX=/ \
+    SHELL=/bin/bash
+
+# s6-overlay
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz && \
+    tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz && \
+    rm -f /tmp/s6-overlay-*.tar.xz
+
+# System packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server \
+    openssh-client \
+    sudo \
+    git curl wget vim htop tmux \
+    build-essential cmake \
+    python3-pip python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# SSH
+RUN mkdir -p /var/run/sshd && \
+    sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config && \
+    if awk -F: '$1 == "root" { exit !($2 == "" || $2 == "!" || $2 == "*") }' /etc/shadow; then \
+        echo "root:${ROOT_PASSWORD}" | chpasswd; \
+    fi
+
+# Notebook user
+RUN if ! getent group "${NB_GID}" >/dev/null; then \
+        groupadd -g "${NB_GID}" "${NB_USER}"; \
+    fi && \
+    if ! id -u "${NB_USER}" >/dev/null 2>&1; then \
+        useradd -m -s /bin/bash -u "${NB_UID}" -g "${NB_GID}" "${NB_USER}"; \
+    fi && \
+    mkdir -p "${WORK_DIR}" && \
+    chown -R "${NB_UID}:${NB_GID}" "${WORK_DIR}" && \
+    echo "${NB_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${NB_USER} && \
+    chmod 0440 /etc/sudoers.d/${NB_USER}
+
+# SSH key for the notebook user
+RUN mkdir -p ${WORK_DIR}/.ssh /root/.ssh && \
+    if [ ! -f ${WORK_DIR}/.ssh/id_rsa ]; then \
+        ssh-keygen -t rsa -b 4096 -N "" -f ${WORK_DIR}/.ssh/id_rsa; \
+    fi && \
+    cp ${WORK_DIR}/.ssh/id_rsa.pub ${WORK_DIR}/.ssh/authorized_keys && \
+    chown -R ${NB_UID}:${NB_GID} ${WORK_DIR}/.ssh && \
+    chmod 700 ${WORK_DIR}/.ssh && \
+    chmod 600 ${WORK_DIR}/.ssh/id_rsa ${WORK_DIR}/.ssh/authorized_keys && \
+    chmod 644 ${WORK_DIR}/.ssh/id_rsa.pub
+
+# Python / Jupyter
+RUN python -m pip install --no-cache-dir jupyterlab ipywidgets
+
+# s6 service: jupyter
+RUN mkdir -p /etc/services.d/jupyter
+COPY <<'EOF' /etc/services.d/jupyter/run
+#!/command/with-contenv bash
+set -e
+exec s6-setuidgid "${NB_USER}" jupyter lab \
+  --ip=0.0.0.0 \
+  --port="${JUPYTER_PORT:-8888}" \
+  --no-browser \
+  --ServerApp.base_url="${NB_PREFIX:-/}" \
+  --ServerApp.token="" \
+  --ServerApp.password=""
+EOF
+RUN chmod +x /etc/services.d/jupyter/run
+
+# s6 service: ssh
+RUN mkdir -p /etc/services.d/ssh
+COPY <<'EOF' /etc/services.d/ssh/run
+#!/command/with-contenv bash
+set -e
+exec /usr/sbin/sshd -D -e
+EOF
+RUN chmod +x /etc/services.d/ssh/run
+
+WORKDIR ${WORK_DIR}
+
+EXPOSE ${JUPYTER_PORT} ${SSH_PORT}
+
+ENTRYPOINT ["/init"]
