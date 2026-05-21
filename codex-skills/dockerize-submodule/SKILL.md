@@ -71,16 +71,20 @@ Create `docker/<name>/Dockerfile` with this structure:
 3. `WORKDIR /<name>`
 4. Install the repo’s standard debug-friendly apt toolchain:
    - `git zsh vim git-lfs wget unzip bzip2 ca-certificates openssh-server clang-format htop iotop rsync ffmpeg curl cmake make less time sqlite3 tree gdb g++ ninja-build build-essential tmux locales lsb-release nano nethogs net-tools valgrind xz-utils sudo pciutils`
-5. Add only the extra system packages actually implied by the project dependencies
-6. Install Miniconda and create the conda env in one layer
-7. Generate SSH host keys
-8. Export PATH to the conda env
-9. `COPY thirdparty/<name> .`
-10. If the target repo depends on sibling submodules, copy those too from the repo root
-11. Install project dependencies with `conda run -n "${CONDA_ENV}" ...`
-12. If model downloads are documented, download them to `/opt/var/models/<model-name>`
-13. Use BuildKit secret `hf_token` for gated Hugging Face downloads
-14. Set a minimal `CMD` that performs a real smoke test such as an import or help command
+5. Generate and configure locales (the `locales` apt package alone does not generate any locale):
+   - `RUN locale-gen en_US.UTF-8 zh_CN.UTF-8 && update-locale LANG=en_US.UTF-8`
+   - Then `ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8`
+   - Place the `ENV` **after** `locale-gen`. If `LC_ALL=en_US.UTF-8` is set before the locale exists, every subsequent `RUN` step (miniconda, pip, conda) emits "Setting locale failed" warnings.
+6. Add only the extra system packages actually implied by the project dependencies
+7. Install Miniconda and create the conda env in one layer
+8. Generate SSH host keys
+9. Export PATH to the conda env
+10. `COPY thirdparty/<name> .`
+11. If the target repo depends on sibling submodules, copy those too from the repo root
+12. Install project dependencies with `conda run -n "${CONDA_ENV}" ...`
+13. If model downloads are documented, download them to `/opt/var/models/<model-name>`
+14. Use BuildKit secret `hf_token` for gated Hugging Face downloads
+15. Set a minimal `CMD` that performs a real smoke test such as an import or help command
 
 ## Workflow requirements
 

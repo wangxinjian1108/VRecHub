@@ -85,7 +85,19 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
      - `pyopengl` → `libgl1`, `libglu1-mesa`
    - Do not add packages that are not required by the project
 
-   **d. Miniconda + conda env**
+   **d. Generate locales**
+   - The `locales` apt package alone does not generate any locale — without this step `locale -a` only shows `C`/`POSIX` and any process that inherits `LANG=en_US.UTF-8` from the host (e.g. K8s notebook) emits `Setting locale failed` warnings.
+   - Generate en_US.UTF-8 and zh_CN.UTF-8 (Chinese path/filename support), then set the env vars. **Place the `ENV` block AFTER `locale-gen`** so subsequent RUN steps (miniconda, pip) don't run with a not-yet-generated locale:
+     ```dockerfile
+     RUN locale-gen en_US.UTF-8 zh_CN.UTF-8 \
+         && update-locale LANG=en_US.UTF-8
+
+     ENV LANG=en_US.UTF-8 \
+         LANGUAGE=en_US:en \
+         LC_ALL=en_US.UTF-8
+     ```
+
+   **e. Miniconda + conda env**
    - Install Miniconda, accept TOS for both default channels (without `--override-channels`), create the conda env, clean cache — all in one `RUN` layer:
      ```dockerfile
      RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
@@ -97,23 +109,23 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
          && "${CONDA_DIR}/bin/conda" clean -afy
      ```
 
-   **e. SSH host keys**
+   **f. SSH host keys**
    ```dockerfile
    RUN mkdir -p /var/run/sshd /root/.ssh \
        && ssh-keygen -A
    ```
 
-   **f. PATH**
+   **g. PATH**
    ```dockerfile
    ENV PATH=${CONDA_DIR}/envs/${CONDA_ENV}/bin:${CONDA_DIR}/bin:${PATH}
    ```
 
-   **g. Copy submodule & install dependencies**
+   **h. Copy submodule & install dependencies**
    - All submodules are available in the build context (repo root). Use `COPY <submodule-path> .` to copy the target submodule, and `COPY <other-submodule-path> <other-submodule-path>` for any dependency submodules — do NOT use `git clone` or `pip install git+https://` during build
    - Read the submodule's README and install scripts to understand the correct install order (e.g. torch before requirements.txt). Use `conda run -n "${CONDA_ENV}"` for all pip/python commands
    - Install dependencies, then **remove source directories in the same `RUN` layer** to keep the image clean
 
-   **h. Model download**
+   **i. Model download**
    - Read the README and docs to find all model/checkpoint downloads (HuggingFace, GitHub releases, direct URLs, etc.)
    - If the repo mentions downloadable models, add **actual** (not commented) `RUN` steps to download them into `/opt/var/models/`
    - All models go to `/opt/var/models/<model-name>` regardless of where the repo's README says to put them
@@ -136,7 +148,7 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
      ```
    - If no models are mentioned in the README, skip this step entirely (do not add commented templates)
 
-   **i. CMD / ENTRYPOINT**
+   **j. CMD / ENTRYPOINT**
    - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)
 
 3.5. **Ask about Zelos Harbor** — use AskUserQuestion to ask the user whether to also push to Zelos Harbor (`harbor-volc.zelostech.com.cn:5443`). If yes, the image will be pushed to `harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>:<tag>` by default. This will be used in step 4 to add Harbor login, tag, and push steps.
