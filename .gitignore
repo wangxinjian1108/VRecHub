@@ -1,1 +1,6 @@
 config/token.yaml
+
+# Local secrets — never commit
+.env
+.env.*
+!.env.example
