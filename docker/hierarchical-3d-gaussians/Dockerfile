@@ -25,6 +25,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ln -sf /usr/bin/python3.10 /usr/bin/python \
     && rm -rf /var/lib/apt/lists/*
 
+# Generate en_US.UTF-8 and zh_CN.UTF-8 so bash / perl / python don't fall back to POSIX
+RUN locale-gen en_US.UTF-8 zh_CN.UTF-8 \
+    && update-locale LANG=en_US.UTF-8
+
+# Place ENV LANG/LC_ALL AFTER locale-gen, otherwise later RUN steps inherit
+# LC_ALL=en_US.UTF-8 before the locale is generated and emit warnings.
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
 COPY thirdparty/hierarchical-3d-gaussians .
 
 RUN if [ ! -f submodules/hierarchy-rasterizer/third_party/glm/CMakeLists.txt ]; then \
