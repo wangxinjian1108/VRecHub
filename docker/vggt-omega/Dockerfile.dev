@@ -82,11 +82,13 @@ RUN mkdir -p /etc/services.d/jupyter
 COPY <<'EOF' /etc/services.d/jupyter/run
 #!/command/with-contenv bash
 set -e
+cd "${HOME:-/home/jovyan}"
 exec s6-setuidgid "${NB_USER}" jupyter lab \
   --ip=0.0.0.0 \
   --port="${JUPYTER_PORT:-8888}" \
   --no-browser \
   --ServerApp.base_url="${NB_PREFIX:-/}" \
+  --ServerApp.root_dir="${HOME:-/home/jovyan}" \
   --ServerApp.token="" \
   --ServerApp.password=""
 EOF
