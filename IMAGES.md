@@ -4,6 +4,7 @@
 |------|------------|------|---------|------|------|
 | FoundationStereo | `ghcr.io/wangxinjian1108/foundationstereo` | 12.4 | 2.4.1 | [arXiv:2501.09898](https://arxiv.org/abs/2501.09898) | 立体匹配基础模型，CVPR 2025 Oral (Best Paper Nomination) |
 | colmap | `ghcr.io/wangxinjian1108/colmap` | 12.6 | latest | [CVPR 2016](https://demuc.de/papers/schoenberger2016sfm.pdf) | Structure-from-Motion 和 Multi-View Stereo 管道 |
+| dvlt | `ghcr.io/wangxinjian1108/dvlt` | 12.4 | 2.5.1 | [arXiv:2605.30215](https://arxiv.org/abs/2605.30215) | Déjà View：循环 Transformer 用于多视角 3D 重建 (NVIDIA) |
 | hierarchical-3d-gaussians | `ghcr.io/wangxinjian1108/hierarchical-3d-gaussians` | 11.8 | 2.0.1 | [SIGGRAPH 2024](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/) | 层次化 3D 高斯表示，超大规模场景实时渲染 |
 | lingbot-map | `ghcr.io/wangxinjian1108/lingbot-map` | 12.8 | 2.8.0 | [arXiv:2604.14141](https://arxiv.org/abs/2604.14141) | 语言引导的建图方法 |
 | LoGeR | `ghcr.io/wangxinjian1108/loger` | 12.6 | 2.6.0 | [arXiv:2603.03269](https://arxiv.org/abs/2603.03269) | 长上下文几何重建，混合记忆机制 |
@@ -18,4 +19,4 @@
 | vggt-omega | `ghcr.io/wangxinjian1108/vggt-omega` | 12.6 | 2.6.0 | [arXiv:2605.15195](https://arxiv.org/abs/2605.15195) | VGGT-Ω：前馈式相机与深度重建 (Oxford VGG + Meta AI), CVPR 2026 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 15 个镜像，14 篇独立论文。
+共 16 个镜像，15 篇独立论文。
