@@ -46,3 +46,6 @@
 [submodule "thirdparty/dvlt"]
 	path = thirdparty/dvlt
 	url = git@github.com:wangxinjian1108/dvlt.git
+[submodule "thirdparty/C4G"]
+	path = thirdparty/C4G
+	url = git@github.com:wangxinjian1108/C4G.git

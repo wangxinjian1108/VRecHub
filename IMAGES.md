@@ -2,6 +2,7 @@
 
 | 项目 | Docker 镜像 | CUDA | PyTorch | 论文 | 描述 |
 |------|------------|------|---------|------|------|
+| C4G | `ghcr.io/wangxinjian1108/c4g` | 12.1 | 2.2.0 | [Project Page](https://cvlab-kaist.github.io/C4G) | 紧凑高斯学习全局运动，前馈式 4D 重建 (KAIST + ETH + Sony AI) |
 | FoundationStereo | `ghcr.io/wangxinjian1108/foundationstereo` | 12.4 | 2.4.1 | [arXiv:2501.09898](https://arxiv.org/abs/2501.09898) | 立体匹配基础模型，CVPR 2025 Oral (Best Paper Nomination) |
 | colmap | `ghcr.io/wangxinjian1108/colmap` | 12.6 | latest | [CVPR 2016](https://demuc.de/papers/schoenberger2016sfm.pdf) | Structure-from-Motion 和 Multi-View Stereo 管道 |
 | dvlt | `ghcr.io/wangxinjian1108/dvlt` | 12.4 | 2.5.1 | [arXiv:2605.30215](https://arxiv.org/abs/2605.30215) | Déjà View：循环 Transformer 用于多视角 3D 重建 (NVIDIA) |
@@ -19,4 +20,4 @@
 | vggt-omega | `ghcr.io/wangxinjian1108/vggt-omega` | 12.6 | 2.6.0 | [arXiv:2605.15195](https://arxiv.org/abs/2605.15195) | VGGT-Ω：前馈式相机与深度重建 (Oxford VGG + Meta AI), CVPR 2026 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 16 个镜像，15 篇独立论文。
+共 17 个镜像，16 篇独立论文。
