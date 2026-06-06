@@ -10,6 +10,7 @@
 | lingbot-map | `ghcr.io/wangxinjian1108/lingbot-map` | 12.8 | 2.8.0 | [arXiv:2604.14141](https://arxiv.org/abs/2604.14141) | 语言引导的建图方法 |
 | LoGeR | `ghcr.io/wangxinjian1108/loger` | 12.6 | 2.6.0 | [arXiv:2603.03269](https://arxiv.org/abs/2603.03269) | 长上下文几何重建，混合记忆机制 |
 | map-anything | `ghcr.io/wangxinjian1108/map-anything` | 12.6 | latest | [arXiv:2509.13414](https://arxiv.org/abs/2509.13414) | 通用语义建图 (Meta Research) |
+| Open-d4rt | `ghcr.io/wangxinjian1108/open-d4rt` | 12.4 | 2.6.0 | [Project Page](https://d4rt-paper.github.io/) | D4RT 非官方实现：4D 重建与跟踪 (RHOS Team / SJTU MVIG) |
 | Pi3 | `ghcr.io/wangxinjian1108/pi3` | 12.4 | 2.5.1 | [arXiv:2507.13347](https://arxiv.org/abs/2507.13347) | 可扩展的置换等变视觉几何学习 |
 | Pi-Long | `ghcr.io/wangxinjian1108/pi-long` | 11.8 | 2.5.1 | 无独立论文，参考 [VGGT-Long](https://arxiv.org/abs/2507.16443) + [Pi3](https://arxiv.org/abs/2507.13347) | 基于 VGGT-Long 和 Pi3 的长序列重建 |
 | sam3 | `ghcr.io/wangxinjian1108/sam3` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | Segment Anything with Concepts (Meta AI) |
@@ -20,4 +21,4 @@
 | vggt-omega | `ghcr.io/wangxinjian1108/vggt-omega` | 12.6 | 2.6.0 | [arXiv:2605.15195](https://arxiv.org/abs/2605.15195) | VGGT-Ω：前馈式相机与深度重建 (Oxford VGG + Meta AI), CVPR 2026 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 17 个镜像，16 篇独立论文。
+共 18 个镜像，17 篇独立论文。

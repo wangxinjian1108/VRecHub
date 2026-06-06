@@ -49,3 +49,6 @@
 [submodule "thirdparty/C4G"]
 	path = thirdparty/C4G
 	url = git@github.com:wangxinjian1108/C4G.git
+[submodule "thirdparty/Open-d4rt"]
+	path = thirdparty/Open-d4rt
+	url = git@github.com:wangxinjian1108/Open-d4rt.git
