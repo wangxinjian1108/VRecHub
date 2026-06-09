@@ -13,6 +13,7 @@
 | Open-d4rt | `ghcr.io/wangxinjian1108/open-d4rt` | 12.4 | 2.6.0 | [Project Page](https://d4rt-paper.github.io/) | D4RT 非官方实现：4D 重建与跟踪 (RHOS Team / SJTU MVIG) |
 | Pi3 | `ghcr.io/wangxinjian1108/pi3` | 12.4 | 2.5.1 | [arXiv:2507.13347](https://arxiv.org/abs/2507.13347) | 可扩展的置换等变视觉几何学习 |
 | Pi-Long | `ghcr.io/wangxinjian1108/pi-long` | 11.8 | 2.5.1 | 无独立论文，参考 [VGGT-Long](https://arxiv.org/abs/2507.16443) + [Pi3](https://arxiv.org/abs/2507.13347) | 基于 VGGT-Long 和 Pi3 的长序列重建 |
+| Qwen3-VL | `ghcr.io/wangxinjian1108/qwen3-vl` | 12.8 | latest | [arXiv:2511.21631](https://arxiv.org/abs/2511.21631) | Qwen3 视觉语言模型：多模态推理、OCR、视频理解 (Alibaba Qwen) |
 | sam3 | `ghcr.io/wangxinjian1108/sam3` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | Segment Anything with Concepts (Meta AI) |
 | Scal3R | `ghcr.io/wangxinjian1108/scal3r` | 12.8 | latest | [arXiv:2604.08542](https://arxiv.org/abs/2604.08542) | 可扩展 3D 重建，CVPR 2026 Highlight |
 | StreamVGGT | `ghcr.io/wangxinjian1108/streamvggt` | 12.1 | 2.3.1 | [arXiv:2507.11539](https://arxiv.org/abs/2507.11539) | 实时流式 4D 视觉几何感知 |
@@ -21,4 +22,4 @@
 | vggt-omega | `ghcr.io/wangxinjian1108/vggt-omega` | 12.6 | 2.6.0 | [arXiv:2605.15195](https://arxiv.org/abs/2605.15195) | VGGT-Ω：前馈式相机与深度重建 (Oxford VGG + Meta AI), CVPR 2026 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 18 个镜像，17 篇独立论文。
+共 19 个镜像，18 篇独立论文。

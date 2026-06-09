@@ -52,3 +52,6 @@
 [submodule "thirdparty/Open-d4rt"]
 	path = thirdparty/Open-d4rt
 	url = git@github.com:wangxinjian1108/Open-d4rt.git
+[submodule "thirdparty/Qwen3-VL"]
+	path = thirdparty/Qwen3-VL
+	url = git@github.com:wangxinjian1108/Qwen3-VL.git
