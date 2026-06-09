@@ -1,4 +1,4 @@
-Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow for it.
+Dockerize a submodule: generate a minimal Dockerfile, Dockerfile.dev (SSH + Jupyter dev layer), and GitHub Actions workflow for it.
 
 ## Argument
 `$ARGUMENTS` is the submodule path or name (e.g. `thirdparty/Scal3R` or just `Scal3R`).
@@ -205,6 +205,161 @@ Dockerize a submodule: generate a minimal Dockerfile and GitHub Actions workflow
         - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
         - **(If Harbor enabled)** `name=harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>,enable=${{ secrets.HARBOR_USERNAME != '' }}`
      8. Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
-     9. `docker/build-push-action@v6` with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR. Buildx pushes to all registries listed in metadata-action in one shot — do NOT use `docker tag` + `docker push` separately.
+     9. Set runtime base tag for dev image:
+        ```yaml
+        - name: Set runtime base tag for dev image
+          id: runtime-base
+          run: |
+            echo "remote=ghcr.io/${{ github.repository_owner }}/<repo-name>:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+        ```
+     10. `docker/build-push-action@v6` for **runtime image** with `context: .` (repo root, so all submodules are available), `file: docker/<repo-name>/Dockerfile`, GHA cache, push only when not PR. Include the `${{ steps.runtime-base.outputs.remote }}` tag in addition to the metadata tags. Buildx pushes to all registries listed in metadata-action in one shot — do NOT use `docker tag` + `docker push` separately. If model download uses HF secret, add:
+        ```yaml
+        secrets: |
+          hf_token=${{ secrets.HF_TOKEN }}
+        ```
+     11. Docker metadata for dev image:
+        ```yaml
+        - name: Docker metadata for dev image
+          id: meta-dev
+          uses: docker/metadata-action@v5
+          with:
+            images: |
+              name=${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
+              ghcr.io/${{ github.repository_owner }}/<repo-name>
+            tags: |
+              type=raw,value=dev
+              type=sha,prefix=dev-sha-,format=short
+        ```
+     12. `docker/build-push-action@v6` for **dev image** — only when not PR:
+        ```yaml
+        - name: Build dev image
+          if: github.event_name != 'pull_request'
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            file: docker/<repo-name>/Dockerfile.dev
+            push: true
+            build-args: |
+              BASE_IMAGE=${{ steps.runtime-base.outputs.remote }}
+            tags: ${{ steps.meta-dev.outputs.tags }}
+            labels: ${{ steps.meta-dev.outputs.labels }}
+            cache-from: type=gha,scope=dev
+            cache-to: type=gha,mode=max,scope=dev
+        ```
 
-5. **Report** — after writing both files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.
+4.5. **Create `Dockerfile.dev`** — write `docker/<repo-name>/Dockerfile.dev`. This is a standard dev layer on top of the runtime image, providing SSH + JupyterLab via s6-overlay. Use this exact template (only change the `BASE_IMAGE` default to match `ghcr.io/wangxinjian1108/<repo-name-lowercase>:latest`):
+
+   ```dockerfile
+   ARG BASE_IMAGE=ghcr.io/wangxinjian1108/<repo-name-lowercase>:latest
+   FROM ${BASE_IMAGE}
+
+   ARG S6_OVERLAY_VERSION=3.2.0.2
+   ARG JUPYTER_PORT=8888
+   ARG SSH_PORT=22
+   ARG NB_USER=jovyan
+   ARG NB_UID=1000
+   ARG NB_GID=100
+   ARG WORK_DIR=/home/${NB_USER}
+   ARG ROOT_PASSWORD=ShARC
+
+   ENV DEBIAN_FRONTEND=noninteractive \
+       NB_USER=${NB_USER} \
+       NB_UID=${NB_UID} \
+       NB_GID=${NB_GID} \
+       HOME=${WORK_DIR} \
+       JUPYTER_PORT=${JUPYTER_PORT} \
+       SSH_PORT=${SSH_PORT} \
+       NB_PREFIX=/ \
+       SHELL=/bin/bash
+
+   # s6-overlay
+   ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+   ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+   RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz && \
+       tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz && \
+       rm -f /tmp/s6-overlay-*.tar.xz
+
+   # System packages
+   RUN apt-get update && apt-get install -y --no-install-recommends \
+       openssh-server \
+       openssh-client \
+       sudo \
+       git curl wget vim htop tmux \
+       build-essential cmake \
+       python3-pip python3-dev \
+       && rm -rf /var/lib/apt/lists/*
+
+   # SSH
+   RUN mkdir -p /var/run/sshd && \
+       sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+       sed -i 's/#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+       sed -i 's/#PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+       sed -i 's/#UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config && \
+       if awk -F: '$1 == "root" { exit !($2 == "" || $2 == "!" || $2 == "*") }' /etc/shadow; then \
+           echo "root:${ROOT_PASSWORD}" | chpasswd; \
+       fi
+
+   # Notebook user
+   RUN if ! getent group "${NB_GID}" >/dev/null; then \
+           groupadd -g "${NB_GID}" "${NB_USER}"; \
+       fi && \
+       existing_user=$(getent passwd "${NB_UID}" | cut -d: -f1 || true) && \
+       if [ -n "$existing_user" ] && [ "$existing_user" != "${NB_USER}" ]; then \
+           usermod -l "${NB_USER}" -d "${WORK_DIR}" -m "$existing_user" 2>/dev/null || true; \
+           usermod -g "${NB_GID}" "${NB_USER}" 2>/dev/null || true; \
+       elif ! id -u "${NB_USER}" >/dev/null 2>&1; then \
+           useradd -m -s /bin/bash -u "${NB_UID}" -g "${NB_GID}" "${NB_USER}"; \
+       fi && \
+       mkdir -p "${WORK_DIR}" && \
+       chown -R "${NB_UID}:${NB_GID}" "${WORK_DIR}" && \
+       echo "${NB_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${NB_USER} && \
+       chmod 0440 /etc/sudoers.d/${NB_USER}
+
+   # SSH key for the notebook user
+   RUN mkdir -p ${WORK_DIR}/.ssh /root/.ssh && \
+       if [ ! -f ${WORK_DIR}/.ssh/id_rsa ]; then \
+           ssh-keygen -t rsa -b 4096 -N "" -f ${WORK_DIR}/.ssh/id_rsa; \
+       fi && \
+       cp ${WORK_DIR}/.ssh/id_rsa.pub ${WORK_DIR}/.ssh/authorized_keys && \
+       chown -R ${NB_UID}:${NB_GID} ${WORK_DIR}/.ssh && \
+       chmod 700 ${WORK_DIR}/.ssh && \
+       chmod 600 ${WORK_DIR}/.ssh/id_rsa ${WORK_DIR}/.ssh/authorized_keys && \
+       chmod 644 ${WORK_DIR}/.ssh/id_rsa.pub
+
+   # Python / Jupyter
+   RUN python -m pip install --no-cache-dir jupyterlab ipywidgets
+
+   # s6 service: jupyter
+   RUN mkdir -p /etc/services.d/jupyter
+   COPY <<'EOF' /etc/services.d/jupyter/run
+   #!/command/with-contenv bash
+   set -e
+   cd "${HOME:-/home/jovyan}"
+   exec s6-setuidgid "${NB_USER}" jupyter lab \
+     --ip=0.0.0.0 \
+     --port="${JUPYTER_PORT:-8888}" \
+     --no-browser \
+     --ServerApp.base_url="${NB_PREFIX:-/}" \
+     --ServerApp.root_dir="${HOME:-/home/jovyan}" \
+     --ServerApp.token="" \
+     --ServerApp.password=""
+   EOF
+   RUN chmod +x /etc/services.d/jupyter/run
+
+   # s6 service: ssh
+   RUN mkdir -p /etc/services.d/ssh
+   COPY <<'EOF' /etc/services.d/ssh/run
+   #!/command/with-contenv bash
+   set -e
+   exec /usr/sbin/sshd -D -e
+   EOF
+   RUN chmod +x /etc/services.d/ssh/run
+
+   WORKDIR ${WORK_DIR}
+
+   EXPOSE ${JUPYTER_PORT} ${SSH_PORT}
+
+   ENTRYPOINT ["/init"]
+   ```
+
+5. **Report** — after writing all files, print a one-line summary: what Dockerfile base was chosen and why, and the workflow file path.
