@@ -71,13 +71,45 @@ jobs:
             type=sha,prefix=sha-,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push
+      - name: Set runtime base tag for dev image
+        id: runtime-base
+        run: |
+          echo "remote=ghcr.io/${{ github.repository_owner }}/open-d4rt:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build runtime image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Open-d4rt/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.runtime-base.outputs.remote }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Docker metadata for dev image
+        id: meta-dev
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            name=${{ secrets.DOCKERHUB_USERNAME }}/open-d4rt,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}
+            ghcr.io/${{ github.repository_owner }}/open-d4rt
+          tags: |
+            type=raw,value=dev
+            type=sha,prefix=dev-sha-,format=short
+
+      - name: Build dev image
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Open-d4rt/Dockerfile.dev
+          push: true
+          build-args: |
+            BASE_IMAGE=${{ steps.runtime-base.outputs.remote }}
+          tags: ${{ steps.meta-dev.outputs.tags }}
+          labels: ${{ steps.meta-dev.outputs.labels }}
+          cache-from: type=gha,scope=dev
+          cache-to: type=gha,mode=max,scope=dev
