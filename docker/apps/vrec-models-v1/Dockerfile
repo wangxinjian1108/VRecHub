@@ -74,4 +74,10 @@ RUN mkdir -p /var/run/sshd /root/.ssh \
 
 ENV PATH=${CONDA_DIR}/bin:${PATH}
 
-# placeholder: per-model env + code follows in later tasks
+RUN conda create -n foundation_stereo python=3.11 -y \
+ && conda create -n pi3                python=3.10 -y \
+ && conda create -n vggt-omega         python=3.10 -y \
+ && conda create -n sam3               python=3.12 -y \
+ && conda clean -afy
+
+# placeholder: per-model COPY + pip installs follow in later tasks
