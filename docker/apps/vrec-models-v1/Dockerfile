@@ -101,4 +101,11 @@ RUN conda run -n pi3 pip install --no-cache-dir \
  && conda run -n pi3 pip install --no-cache-dir -e /app/pi3 \
  && rm -rf /app/pi3/assets
 
-# placeholder: vggt-omega follows
+COPY thirdparty/vggt-omega /app/vggt-omega
+
+RUN conda run -n vggt-omega pip install --no-cache-dir \
+        torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu126 \
+ && conda run -n vggt-omega pip install --no-cache-dir -r /app/vggt-omega/requirements.txt \
+ && conda run -n vggt-omega pip install --no-cache-dir -e /app/vggt-omega
+
+# placeholder: sam3 follows
