@@ -93,4 +93,12 @@ RUN conda run -n foundation_stereo pip install --no-cache-dir \
  && conda run -n foundation_stereo pip install --no-cache-dir \
         flash-attn --no-build-isolation
 
-# placeholder: pi3 follows
+COPY thirdparty/Pi3 /app/pi3
+
+RUN conda run -n pi3 pip install --no-cache-dir \
+        torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu124 \
+ && conda run -n pi3 pip install --no-cache-dir -r /app/pi3/requirements.txt \
+ && conda run -n pi3 pip install --no-cache-dir -e /app/pi3 \
+ && rm -rf /app/pi3/assets
+
+# placeholder: vggt-omega follows
