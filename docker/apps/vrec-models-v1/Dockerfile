@@ -80,4 +80,17 @@ RUN conda create -n foundation_stereo python=3.11 -y \
  && conda create -n sam3               python=3.12 -y \
  && conda clean -afy
 
-# placeholder: per-model COPY + pip installs follow in later tasks
+COPY thirdparty/FoundationStereo /app/foundation_stereo
+
+RUN conda run -n foundation_stereo pip install --no-cache-dir \
+        torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 \
+        --index-url https://download.pytorch.org/whl/cu124 \
+ && conda run -n foundation_stereo pip install --no-cache-dir \
+        scikit-image omegaconf opencv-contrib-python imgaug ninja timm \
+        albumentations scipy joblib scikit-learn ruamel.yaml trimesh \
+        pyyaml imageio open3d transformations einops gdown \
+        huggingface-hub xformers==0.0.28.post1 \
+ && conda run -n foundation_stereo pip install --no-cache-dir \
+        flash-attn --no-build-isolation
+
+# placeholder: pi3 follows
