@@ -108,4 +108,15 @@ RUN conda run -n vggt-omega pip install --no-cache-dir \
  && conda run -n vggt-omega pip install --no-cache-dir -r /app/vggt-omega/requirements.txt \
  && conda run -n vggt-omega pip install --no-cache-dir -e /app/vggt-omega
 
-# placeholder: sam3 follows
+COPY thirdparty/sam3 /app/sam3
+
+RUN conda run -n sam3 pip install --no-cache-dir \
+        torch==2.10.0 torchvision --index-url https://download.pytorch.org/whl/cu128 \
+ && conda run -n sam3 pip install --no-cache-dir -e "/app/sam3[notebooks]" \
+ && conda run -n sam3 pip install --no-cache-dir einops ninja \
+ && conda run -n sam3 pip install --no-cache-dir flash-attn-3 --no-deps --index-url https://download.pytorch.org/whl/cu128 \
+ && rm -rf /app/sam3/examples /app/sam3/assets
+
+RUN mkdir -p /opt/var/models
+
+CMD ["/bin/bash"]
