@@ -70,6 +70,8 @@ Dockerize a submodule: generate a minimal Dockerfile, Dockerfile.dev (SSH + Jupy
          xz-utils \
          sudo \
          pciutils \
+         libarchive-tools \
+         netcat-openbsd \
          && rm -rf /var/lib/apt/lists/*
      ```
    - Thoroughly inspect all available sources to determine which extra system packages are needed — read ALL of the following that exist:
