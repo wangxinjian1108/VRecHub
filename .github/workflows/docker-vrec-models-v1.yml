@@ -36,6 +36,9 @@ jobs:
 
       - name: Init only required submodules
         run: |
+          # .gitmodules uses git@github.com: URLs; rewrite to HTTPS with the
+          # workflow token so we don't need SSH keys on the runner.
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf git@github.com:
           git submodule update --init --depth 1 --recursive --jobs 4 \
             thirdparty/FoundationStereo \
             thirdparty/Pi3 \
