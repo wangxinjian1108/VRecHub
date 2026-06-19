@@ -32,8 +32,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Init only required submodules
+        run: |
+          git submodule update --init --depth 1 --recursive --jobs 4 \
+            thirdparty/FoundationStereo \
+            thirdparty/Pi3 \
+            thirdparty/vggt-omega \
+            thirdparty/sam3
 
       - name: Free disk space
         run: |
