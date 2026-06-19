@@ -111,7 +111,7 @@ RUN conda run -n vggt-omega pip install --no-cache-dir \
 COPY thirdparty/sam3 /app/sam3
 
 RUN conda run -n sam3 pip install --no-cache-dir \
-        torch==2.10.0 torchvision --index-url https://download.pytorch.org/whl/cu128 \
+        torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/cu128 \
  && conda run -n sam3 pip install --no-cache-dir -e "/app/sam3[notebooks]" \
  && conda run -n sam3 pip install --no-cache-dir einops ninja \
  && conda run -n sam3 pip install --no-cache-dir flash-attn-3 --no-deps --index-url https://download.pytorch.org/whl/cu128 \
