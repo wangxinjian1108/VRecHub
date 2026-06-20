@@ -170,7 +170,23 @@ Dockerize a submodule: generate a minimal Dockerfile, Dockerfile.dev (SSH + Jupy
        packages: write
      ```
    - Steps in order:
-     1. `actions/checkout@v4` with `submodules: recursive`
+     1. `actions/checkout@v4` **without** `submodules: recursive`. Recursive checkout would also try to clone every other submodule in the repo — including any whose hosts may be unreachable or behind bot-protection (e.g. `gitlab.inria.fr` returns Anubis challenges to GitHub-hosted runners). Use a targeted manual init step instead:
+        ```yaml
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Init only required submodules
+          run: |
+            # .gitmodules typically uses git@github.com: URLs; rewrite to HTTPS
+            # with the workflow token so we don't need SSH keys on the runner.
+            git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf git@github.com:
+            git submodule update --init --depth 1 --recursive --jobs 4 \
+              thirdparty/<submodule-path> \
+              <other-submodule-paths-if-any>
+        ```
+        List only the submodules the Dockerfile actually `COPY`s (the target submodule plus any dependency submodules). Do NOT add unrelated repos.
      2. Free disk space (required for large CUDA base images):
         ```yaml
         - name: Free disk space
