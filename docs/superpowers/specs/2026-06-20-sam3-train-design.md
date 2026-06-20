@@ -38,7 +38,7 @@ docs/superpowers/specs/
 继承自 base：
 - CUDA 12.8.1 + Python 3.12 + torch 2.10.0+cu128 + torchvision 0.25.0
 - conda env `sam3` + flash-attn-3
-- sam3 源码于 `/app/sam3`（editable 安装）
+- sam3 源码于 `/sam3`（editable 安装；upstream `docker/sam3/Dockerfile` 用 `WORKDIR /sam3` + `COPY thirdparty/sam3 .`）
 - 已装的 sam3 extras: `[notebooks]`
 - 权重于 `/opt/var/models/sam3`（构建时通过 HF_TOKEN 下载好）
 
@@ -53,12 +53,12 @@ docs/superpowers/specs/
 ARG BASE_IMAGE=ghcr.io/wangxinjian1108/sam3:latest
 FROM ${BASE_IMAGE}
 
-RUN conda run -n sam3 pip install --no-cache-dir "/app/sam3[train]"
+RUN cd /sam3 && conda run -n sam3 pip install --no-cache-dir -e ".[train]"
 
 CMD ["/bin/bash"]
 ```
 
-`pip install /app/sam3[train]`（无 `-e`）—— 因为 base 已经 editable 安装过，这一步只解析 `[train]` extras 列表并装新包，不会重装 sam3 本身。
+`cd /sam3 && pip install -e ".[train]"` —— pip 不接受 `pip install <abs-path>[extra]`（解析成 path glob），也不接受 `pip install -e <abs-path>[extra]`（拒绝 "not a valid editable requirement"）。需要先 `cd` 进源码目录，再用相对 `.` 调用，这是 upstream `docker/sam3/Dockerfile` 已验证的写法。
 
 ## 6. CI workflow
 
@@ -130,7 +130,7 @@ docker run --gpus all --rm -it \
   -v /path/to/dataset:/data \
   -v /path/to/exp_output:/output \
   ghcr.io/wangxinjian1108/sam3-train:latest \
-  bash -lc "cd /app/sam3 && python -m train ..."
+  bash -lc "cd /sam3 && python -m train ..."
 
 # dev（SSH+Jupyter，长跑训练 + 调参）
 docker run --gpus all -d \
