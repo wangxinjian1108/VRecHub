@@ -74,24 +74,19 @@ RUN mkdir -p /var/run/sshd /root/.ssh \
 
 ENV PATH=${CONDA_DIR}/bin:${PATH}
 
-RUN conda create -n foundation_stereo python=3.11 -y \
+RUN conda create -n fast-foundationstereo python=3.12 -y \
  && conda create -n pi3                python=3.10 -y \
  && conda create -n vggt-omega         python=3.10 -y \
  && conda create -n sam3               python=3.12 -y \
  && conda clean -afy
 
-COPY thirdparty/FoundationStereo /app/foundation_stereo
+COPY thirdparty/Fast-FoundationStereo /app/fast-foundationstereo
 
-RUN conda run -n foundation_stereo pip install --no-cache-dir \
-        torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 \
+RUN conda run -n fast-foundationstereo pip install --no-cache-dir \
+        torch==2.6.0 torchvision==0.21.0 xformers \
         --index-url https://download.pytorch.org/whl/cu124 \
- && conda run -n foundation_stereo pip install --no-cache-dir \
-        scikit-image omegaconf opencv-contrib-python imgaug ninja timm \
-        albumentations scipy joblib scikit-learn ruamel.yaml trimesh \
-        pyyaml imageio open3d transformations einops gdown \
-        huggingface-hub xformers==0.0.28.post1 \
- && conda run -n foundation_stereo pip install --no-cache-dir \
-        flash-attn --no-build-isolation
+ && conda run -n fast-foundationstereo pip install --no-cache-dir \
+        -r /app/fast-foundationstereo/requirements.txt
 
 COPY thirdparty/Pi3 /app/pi3
 

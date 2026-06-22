@@ -6,7 +6,7 @@ on:
     tags: ["v*.*.*"]
     paths:
       - "docker/apps/vrec-models-v1/**"
-      - "thirdparty/FoundationStereo"
+      - "thirdparty/Fast-FoundationStereo"
       - "thirdparty/Pi3"
       - "thirdparty/vggt-omega"
       - "thirdparty/sam3"
@@ -15,7 +15,7 @@ on:
     branches: [master]
     paths:
       - "docker/apps/vrec-models-v1/**"
-      - "thirdparty/FoundationStereo"
+      - "thirdparty/Fast-FoundationStereo"
       - "thirdparty/Pi3"
       - "thirdparty/vggt-omega"
       - "thirdparty/sam3"
@@ -40,7 +40,7 @@ jobs:
           # workflow token so we don't need SSH keys on the runner.
           git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf git@github.com:
           git submodule update --init --depth 1 --recursive --jobs 4 \
-            thirdparty/FoundationStereo \
+            thirdparty/Fast-FoundationStereo \
             thirdparty/Pi3 \
             thirdparty/vggt-omega \
             thirdparty/sam3
