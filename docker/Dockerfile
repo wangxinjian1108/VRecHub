@@ -49,6 +49,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6 \
     libxext6 \
     libxrender-dev \
+    libarchive-tools \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # Generate en_US.UTF-8 and zh_CN.UTF-8 so bash / perl / python don't fall back to POSIX
