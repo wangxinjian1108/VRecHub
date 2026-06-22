@@ -55,3 +55,6 @@
 [submodule "thirdparty/Qwen3-VL"]
 	path = thirdparty/Qwen3-VL
 	url = git@github.com:wangxinjian1108/Qwen3-VL.git
+[submodule "thirdparty/Fast-FoundationStereo"]
+	path = thirdparty/Fast-FoundationStereo
+	url = git@github.com:wangxinjian1108/Fast-FoundationStereo.git
