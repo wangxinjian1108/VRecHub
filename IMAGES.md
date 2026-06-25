@@ -19,10 +19,12 @@
 | sam3-train | `ghcr.io/wangxinjian1108/sam3-train` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | sam3 训练镜像：基于 sam3:latest + `[train]` extras (hydra-core / submitit / tensorboard / fvcore / fairscale / torchmetrics 等) |
 | Scal3R | `ghcr.io/wangxinjian1108/scal3r` | 12.8 | latest | [arXiv:2604.08542](https://arxiv.org/abs/2604.08542) | 可扩展 3D 重建，CVPR 2026 Highlight |
 | StreamVGGT | `ghcr.io/wangxinjian1108/streamvggt` | 12.1 | 2.3.1 | [arXiv:2507.11539](https://arxiv.org/abs/2507.11539) | 实时流式 4D 视觉几何感知 |
+| SurroundNEXO | `ghcr.io/wangxinjian1108/surroundnexo` | 12.6 | latest | [arXiv:2606.16960](https://arxiv.org/abs/2606.16960) | 自动驾驶环视低重叠场景的自我中心度量深度，前馈式跨视角一致几何 (SJTU AI + Hello Inc.) |
 | vggt | `ghcr.io/wangxinjian1108/vggt` | 12.1 | 2.3.1 | [arXiv:2503.11651](https://arxiv.org/abs/2503.11651) | Visual Geometry Grounded Transformer (Oxford VGG + Meta AI) |
 | VGGT-Long | `ghcr.io/wangxinjian1108/vggt-long` | 11.8 | 2.5.1 | [arXiv:2507.16443](https://arxiv.org/abs/2507.16443) | 将 VGGT 扩展到公里级长 RGB 序列 |
 | vggt-omega | `ghcr.io/wangxinjian1108/vggt-omega` | 12.6 | 2.6.0 | [arXiv:2605.15195](https://arxiv.org/abs/2605.15195) | VGGT-Ω：前馈式相机与深度重建 (Oxford VGG + Meta AI), CVPR 2026 |
+| vrec-models-train-v1 | `ghcr.io/wangxinjian1108/vrec-models-train-v1` | 12.8 | mixed | 聚合多模型，参考各成员论文 | 训练镜像：基于 vrec-models-v1:latest，sam3 env 加 `[train]` extras（其余 env 不变） |
 | vrec-models-v1 | `ghcr.io/wangxinjian1108/vrec-models-v1` | 12.8 | mixed | 聚合多模型，参考各成员论文 | 聚合推理镜像：Fast-FoundationStereo + Pi3 + vggt-omega + sam3，4 个独立 conda env 共存于一镜像 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 22 个镜像，19 篇独立论文。
+共 24 个镜像，21 篇独立论文。
