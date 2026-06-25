@@ -153,8 +153,6 @@ Dockerize a submodule: generate a minimal Dockerfile, Dockerfile.dev (SSH + Jupy
    **j. CMD / ENTRYPOINT**
    - Define a minimal `CMD` or `ENTRYPOINT` that actually runs the project (use the entry point from pyproject.toml scripts, package.json main, etc.)
 
-3.5. **Ask about Zelos Harbor** — use AskUserQuestion to ask the user whether to also push to Zelos Harbor (`harbor-volc.zelostech.com.cn:5443`). If yes, the image will be pushed to `harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>:<tag>` by default. This will be used in step 4 to add Harbor login, tag, and push steps.
-
 4. **Create the GitHub Actions workflow** — write `.github/workflows/docker-<repo-name>.yml`. Use this structure:
    - Trigger on: push to `master` (tags `v*.*.*`), PR to `master`, `workflow_dispatch`. Add `paths` filter to both push and pull_request so only relevant changes trigger the build:
      ```yaml
@@ -210,18 +208,9 @@ Dockerize a submodule: generate a minimal Dockerfile, Dockerfile.dev (SSH + Jupy
             password: ${{ secrets.DOCKERHUB_TOKEN }}
         ```
      5. Login to ghcr.io — skip on PR (`secrets.GITHUB_TOKEN` always available)
-     6. **(If Harbor enabled)** Login to Zelos Harbor — skip on PR and when secret is empty:
-        ```yaml
-        - name: Login to Zelos Harbor
-          if: github.event_name != 'pull_request' && env.HARBOR_USERNAME != ''
-          env:
-            HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-          run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login harbor-volc.zelostech.com.cn:5443 --username=${{ secrets.HARBOR_USERNAME }} --password-stdin
-        ```
      7. `docker/metadata-action@v5` with images:
         - `name=${{ secrets.DOCKERHUB_USERNAME }}/<repo-name>,enable=${{ secrets.DOCKERHUB_USERNAME != '' }}`
         - `ghcr.io/${{ github.repository_owner }}/<repo-name>`
-        - **(If Harbor enabled)** `name=harbor-volc.zelostech.com.cn:5443/zcloud_auto/<repo-name>,enable=${{ secrets.HARBOR_USERNAME != '' }}`
      8. Tags: `type=ref,event=branch`, `type=semver,pattern={{version}}`, `type=semver,pattern={{major}}.{{minor}}`, `type=sha,prefix=sha-,format=short`, `type=raw,value=latest,enable={{is_default_branch}}`
      9. Set runtime base tag for dev image:
         ```yaml

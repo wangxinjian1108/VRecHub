@@ -58,3 +58,6 @@
 [submodule "thirdparty/Fast-FoundationStereo"]
 	path = thirdparty/Fast-FoundationStereo
 	url = git@github.com:wangxinjian1108/Fast-FoundationStereo.git
+[submodule "thirdparty/SurroundNEXO"]
+	path = thirdparty/SurroundNEXO
+	url = git@github.com:wangxinjian1108/SurroundNEXO.git

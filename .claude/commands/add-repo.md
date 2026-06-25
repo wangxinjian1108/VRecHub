@@ -14,7 +14,6 @@ Add a git repo as a submodule, dockerize it, create a GitHub Actions workflow, c
 2. **Dockerize** — invoke the `/dockerize-submodule` skill with `thirdparty/<repo-name>` as the argument. This handles:
    - Detecting project type, Python version, CUDA version
    - Creating the Dockerfile at `docker/<repo-name>/Dockerfile`
-   - Asking about Zelos Harbor
    - Creating the GitHub Actions workflow at `.github/workflows/docker-<repo-name>.yml`
 
 3. **Commit & push**
