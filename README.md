@@ -8,24 +8,6 @@
 
 ## Skills 速查表
 
-仓库带了一组工程化 skill，覆盖从添加 repo、构建镜像、到验证、审查、通知的全流程。Claude 用 `/skill-name` 触发；codex/openai 用 `$skill-name` 触发。
-
-| Skill | 作用 | Claude | Codex |
-|---|---|:---:|:---:|
-| [`add-repo`](codex-skills/add-repo/SKILL.md) | 给一个 git URL，全自动接入：加 submodule → 生成 Dockerfile + Dockerfile.dev → 生成 workflow → 刷新 IMAGES.md → commit + push + 看 CI | ✅ | ✅ |
-| [`dockerize-submodule`](codex-skills/dockerize-submodule/SKILL.md) | 给一个已存在的 submodule，生成 runtime Dockerfile + workflow（自动识别 CUDA / Python / PyTorch / 系统依赖） | ✅ | ✅ |
-| [`dev-image`](codex-skills/dev-image/SKILL.md) | 给一个 model name，在 runtime 之上派生 dev 镜像（s6 + sshd + JupyterLab + NB_PREFIX），并把 dev build 串进同一个 workflow | — | ✅ |
-| [`list-images`](codex-skills/list-images/SKILL.md) | 扫所有 `docker-*.yml` 和 submodule README，重写 [`IMAGES.md`](IMAGES.md) | ✅ | ✅ |
-| [`update-submodule`](codex-skills/update-submodule/SKILL.md) | 把指定 submodule 更新到 upstream 最新 commit，提交 pointer 改动，触发镜像重建 | ✅ | ✅ |
-| [`train-test`](codex-skills/train-test/SKILL.md) | 拉镜像，在 submodule dev 分支上做数据集转换，跑一个 epoch 训练验证整条 pipeline 通 | ✅ | ✅ |
-| [`ship`](codex-skills/ship/SKILL.md) | 把当前未提交的改动 commit + push，必要时开 PR，监控 CI 最多 3 轮修复 | ✅ | ✅ |
-| [`review`](codex-skills/review/SKILL.md) | 用挑刺心态审 PR / diff，重点找正确性 / 回归 / 错误假设 / 缺测试 | — | ✅ |
-| [`security-review`](codex-skills/security-review/SKILL.md) | 审 diff 的安全问题：secret 泄漏、供应链、Dockerfile / CI 权限 | — | ✅ |
-| [`simplify`](codex-skills/simplify/SKILL.md) | 不改行为前提下简化代码 / 脚本 / Dockerfile，去重 + 降复杂度 | — | ✅ |
-| [`notify`](codex-skills/notify/SKILL.md) | 把 commit / CI 状态推到 Slack `#cc` 等渠道 | — | ✅ |
-
-> Claude 列有 ✅ 表示 `.claude/commands/` 下也有对应的 markdown command；codex 列总是 ✅，因为这些 skill 主要在 codex-skills/ 下维护。
-
 ## 最常用的几条工作流
 
 ### 新增一个 model
@@ -93,6 +75,56 @@
 | `HARBOR_USERNAME` / `HARBOR_PASSWORD` | 可选，推 Zelos 内部 Harbor（多数 model 不开） |
 
 `GITHUB_TOKEN` 由 GitHub 自动注入，无需配置。
+
+## 拉取镜像（国内 / 内网网络）
+
+`ghcr.io` 与 `docker.io` 在国内网络基本不可达（TCP 能连、TLS 握手被阻断），
+所以 `docker pull ghcr.io/...` 会失败。有两条实测可用的路径：
+
+1. **国内 ghcr 加速**（匿名可用，12.8 GB 的镜像约 11 分钟拉完）：
+
+   ```bash
+   docker pull ghcr.nju.edu.cn/wangxinjian1108/<name>:latest
+   ```
+
+   备用节点 `ghcr.m.daocloud.io`（可达，但需要登录）。
+
+2. **内网 Harbor**（Zelos 内网直连，最快）：
+
+   ```bash
+   docker pull repo-volc.zelostech.com.cn/zcloud/<name>:latest
+   ```
+
+   内网镜像需要有人推过去：给 workflow 加一段 Harbor 推送（secrets 见
+   [`test-harbor.yml`](.github/workflows/test-harbor.yml) 用到的
+   `HARBOR_USERNAME` / `HARBOR_PASSWORD`），或者在一台能拉 ghcr 的机器上
+   `docker tag` + `docker push`。
+
+例：SkinTokens（runtime 镜像已镜像到内网）:
+
+```bash
+docker pull ghcr.nju.edu.cn/wangxinjian1108/skintokens:latest     # 国内加速
+docker pull repo-volc.zelostech.com.cn/zcloud/skintokens:latest   # 内网
+```
+
+仓库带了一组工程化 skill，覆盖从添加 repo、构建镜像、到验证、审查、通知的全流程。Claude 用 `/skill-name` 触发；codex/openai 用 `$skill-name` 触发。
+
+| Skill | 作用 | Claude | Codex |
+|---|---|:---:|:---:|
+| [`add-repo`](codex-skills/add-repo/SKILL.md) | 给一个 git URL，全自动接入：加 submodule → 生成 Dockerfile + Dockerfile.dev → 生成 workflow → 刷新 IMAGES.md → commit + push + 看 CI | ✅ | ✅ |
+| [`dockerize-submodule`](codex-skills/dockerize-submodule/SKILL.md) | 给一个已存在的 submodule，生成 runtime Dockerfile + workflow（自动识别 CUDA / Python / PyTorch / 系统依赖） | ✅ | ✅ |
+| [`dev-image`](codex-skills/dev-image/SKILL.md) | 给一个 model name，在 runtime 之上派生 dev 镜像（s6 + sshd + JupyterLab + NB_PREFIX），并把 dev build 串进同一个 workflow | — | ✅ |
+| [`list-images`](codex-skills/list-images/SKILL.md) | 扫所有 `docker-*.yml` 和 submodule README，重写 [`IMAGES.md`](IMAGES.md) | ✅ | ✅ |
+| [`update-submodule`](codex-skills/update-submodule/SKILL.md) | 把指定 submodule 更新到 upstream 最新 commit，提交 pointer 改动，触发镜像重建 | ✅ | ✅ |
+| [`train-test`](codex-skills/train-test/SKILL.md) | 拉镜像，在 submodule dev 分支上做数据集转换，跑一个 epoch 训练验证整条 pipeline 通 | ✅ | ✅ |
+| [`ship`](codex-skills/ship/SKILL.md) | 把当前未提交的改动 commit + push，必要时开 PR，监控 CI 最多 3 轮修复 | ✅ | ✅ |
+| [`review`](codex-skills/review/SKILL.md) | 用挑刺心态审 PR / diff，重点找正确性 / 回归 / 错误假设 / 缺测试 | — | ✅ |
+| [`security-review`](codex-skills/security-review/SKILL.md) | 审 diff 的安全问题：secret 泄漏、供应链、Dockerfile / CI 权限 | — | ✅ |
+| [`simplify`](codex-skills/simplify/SKILL.md) | 不改行为前提下简化代码 / 脚本 / Dockerfile，去重 + 降复杂度 | — | ✅ |
+| [`notify`](codex-skills/notify/SKILL.md) | 把 commit / CI 状态推到 Slack `#cc` 等渠道 | — | ✅ |
+
+> Claude 列有 ✅ 表示 `.claude/commands/` 下也有对应的 markdown command；codex 列总是 ✅，因为这些 skill 主要在 codex-skills/ 下维护。
+
 
 ## 仓库结构
 
