@@ -107,12 +107,13 @@ RUN curl -fL --retry 3 \
     && rm /tmp/blender.tar.xz
 
 COPY docker/apps/scene-edit-models-v1/constraints-skintokens.txt /opt/constraints/skintokens.txt
+COPY docker/apps/scene-edit-models-v1/check-skintokens-dependencies.py /opt/constraints/check-skintokens-dependencies.py
 COPY thirdparty/SkinTokens /app/skintokens
 RUN conda run -n skintokens pip install --no-cache-dir \
         torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128 \
     && conda run -n skintokens pip install --no-cache-dir \
         -c /opt/constraints/skintokens.txt -r /app/skintokens/requirements.txt \
-    && conda run -n skintokens pip check
+    && conda run -n skintokens python /opt/constraints/check-skintokens-dependencies.py
 
 # vLLM 0.11.0 requires torch 2.8.0 / torchvision 0.23.0. Keep this stack
 # isolated from SkinTokens; torchcodec 0.7 is paired with torch 2.8.
