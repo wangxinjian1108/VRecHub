@@ -1,0 +1,22 @@
+# Only send the two model sources and this image's build files to BuildKit.
+**
+!thirdparty/
+!thirdparty/SkinTokens/
+!thirdparty/SkinTokens/**
+!thirdparty/Qwen3-VL/
+!thirdparty/Qwen3-VL/**
+!docker/
+!docker/apps/
+!docker/apps/scene-edit-models-v1/
+!docker/apps/scene-edit-models-v1/**
+**/.git
+**/__pycache__
+**/.venv
+**/.cache
+**/*.ckpt
+**/*.safetensors
+**/*.pt
+**/*.pth
+**/pytorch_model*.bin
+thirdparty/SkinTokens/experiments
+thirdparty/SkinTokens/models

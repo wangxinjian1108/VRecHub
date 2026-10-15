@@ -18,6 +18,7 @@
 | sam3 | `ghcr.io/wangxinjian1108/sam3` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | Segment Anything with Concepts (Meta AI) |
 | sam3-train | `ghcr.io/wangxinjian1108/sam3-train` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | sam3 训练镜像：基于 sam3:latest + `[train]` extras (hydra-core / submitit / tensorboard / fvcore / fairscale / torchmetrics 等) |
 | Scal3R | `ghcr.io/wangxinjian1108/scal3r` | 12.8 | latest | [arXiv:2604.08542](https://arxiv.org/abs/2604.08542) | 可扩展 3D 重建，CVPR 2026 Highlight |
+| scene-edit-models-v1 | `ghcr.io/wangxinjian1108/scene-edit-models-v1` | 12.8 | 2.7.0 / 2.8.0 | 聚合 SkinTokens / Qwen3-VL，参考各成员论文 | 场景编辑镜像：SkinTokens + Qwen3-VL（独立 conda env）+ Blender 4.5.3，不含模型权重 |
 | SkinTokens | `ghcr.io/wangxinjian1108/skintokens` | 12.8 | 2.7.0 | [arXiv:2602.04805](https://arxiv.org/abs/2602.04805) | SkinTokens/TokenRig：统一自回归绑定，单张网格直接生成骨架层级 + 逐顶点蒙皮权重 (VAST-AI / Tripo) |
 | StreamVGGT | `ghcr.io/wangxinjian1108/streamvggt` | 12.1 | 2.3.1 | [arXiv:2507.11539](https://arxiv.org/abs/2507.11539) | 实时流式 4D 视觉几何感知 |
 | SurroundNEXO | `ghcr.io/wangxinjian1108/surroundnexo` | 12.6 | latest | [arXiv:2606.16960](https://arxiv.org/abs/2606.16960) | 自动驾驶环视低重叠场景的自我中心度量深度，前馈式跨视角一致几何 (SJTU AI + Hello Inc.) |
@@ -28,4 +29,4 @@
 | vrec-models-v1 | `ghcr.io/wangxinjian1108/vrec-models-v1` | 12.8 | mixed | 聚合多模型，参考各成员论文 | 聚合推理镜像：Fast-FoundationStereo + Pi3 + vggt-omega + sam3，4 个独立 conda env 共存于一镜像 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 25 个镜像，22 篇独立论文。
+共 26 个镜像，22 篇独立论文。
