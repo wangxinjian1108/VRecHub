@@ -115,6 +115,6 @@ RUN --mount=type=secret,id=hf_token,required=false \
 
 # Fail the build (not just the container start) if the runtime stack is broken:
 # bpy is the fragile one because it dlopens the X/GL libraries.
-RUN conda run -n "${CONDA_ENV}" python -c "import bpy, torch, trimesh, transformers; print('skintokens ready:', torch.__version__, torch.version.cuda, bpy.app.version_string)"
+RUN conda run -n "${CONDA_ENV}" python -c "import bpy, torch, trimesh, transformers, scipy; from src.data.dataset import DatasetConfig; print('skintokens ready:', torch.__version__, torch.version.cuda, bpy.app.version_string)"
 
-CMD ["python", "-c", "import bpy, torch, trimesh, transformers; print('skintokens ready:', torch.__version__, torch.version.cuda, bpy.app.version_string)"]
+CMD ["python", "-c", "import bpy, torch, trimesh, transformers, scipy; from src.data.dataset import DatasetConfig; print('skintokens ready:', torch.__version__, torch.version.cuda, bpy.app.version_string)"]
