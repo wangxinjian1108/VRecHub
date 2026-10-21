@@ -24,8 +24,11 @@ COPY thirdparty/GVHMR /app/GVHMR
 RUN conda run -n gvhmr pip install --no-cache-dir --upgrade pip setuptools wheel \
     && conda run -n gvhmr pip install --no-cache-dir "numpy==1.23.5" cython \
     && conda run -n gvhmr pip install --no-cache-dir --no-build-isolation "chumpy==0.70" \
+    && conda run -n gvhmr pip install --no-cache-dir --no-build-isolation \
+        "cython_bbox" "lapx" \
     && conda run -n gvhmr pip install --no-cache-dir -r /app/GVHMR/requirements.txt \
-    && conda run -n gvhmr pip install --no-cache-dir -e /app/GVHMR
+    && conda run -n gvhmr pip install --no-cache-dir -e /app/GVHMR \
+    && conda clean -afy
 
 COPY thirdparty/Motion2MixamoRig /app/Motion2MixamoRig
 
@@ -36,10 +39,12 @@ RUN conda run -n m2mr pip install --no-cache-dir --upgrade pip setuptools wheel 
     && conda run -n m2mr pip install --no-cache-dir --no-build-isolation "chumpy==0.70" \
     && conda run -n m2mr pip install --no-cache-dir -e /app/Motion2MixamoRig \
     && mkdir -p /app/Motion2MixamoRig/assets/mixamo \
+                /app/Motion2MixamoRig/assets/body_models \
                 /app/Motion2MixamoRig/assets/video \
                 /app/Motion2MixamoRig/assets/image \
                 /app/Motion2MixamoRig/weights \
-                /app/Motion2MixamoRig/outputs
+                /app/Motion2MixamoRig/outputs \
+    && conda clean -afy
 
 COPY --chmod=755 docker/apps/scene-edit-models-v2/m2mr.sh /usr/local/bin/m2mr
 COPY --chmod=755 docker/apps/scene-edit-models-v2/gvhmr-demo.sh /usr/local/bin/gvhmr-demo

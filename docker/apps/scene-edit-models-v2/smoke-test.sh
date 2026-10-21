@@ -29,6 +29,8 @@ PY
 
 # --- Motion2MixamoRig ---------------------------------------------------------
 cd /app/Motion2MixamoRig
+export GVHMR_CHECKPOINTS=/app/Motion2MixamoRig/weights
+export GVHMR_BODY_MODELS=/app/Motion2MixamoRig/assets/body_models
 conda run --no-capture-output -n m2mr python - <<'PY'
 import gvhmr
 import motion2mixamorig
