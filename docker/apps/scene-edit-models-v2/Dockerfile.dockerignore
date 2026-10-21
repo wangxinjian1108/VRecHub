@@ -1,0 +1,24 @@
+# Only send the two model sources and this image's build files to BuildKit.
+**
+!thirdparty/
+!thirdparty/GVHMR/
+!thirdparty/GVHMR/**
+!thirdparty/Motion2MixamoRig/
+!thirdparty/Motion2MixamoRig/**
+!docker/
+!docker/apps/
+!docker/apps/scene-edit-models-v2/
+!docker/apps/scene-edit-models-v2/**
+**/.git
+**/__pycache__
+**/.venv
+**/.cache
+**/*.ckpt
+**/*.safetensors
+**/*.pt
+**/*.pth
+**/*.pytorch_model*.bin
+thirdparty/Motion2MixamoRig/weights
+thirdparty/Motion2MixamoRig/outputs
+thirdparty/GVHMR/inputs
+thirdparty/GVHMR/outputs

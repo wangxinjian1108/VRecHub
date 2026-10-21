@@ -64,3 +64,9 @@
 [submodule "thirdparty/SkinTokens"]
 	path = thirdparty/SkinTokens
 	url = git@github.com:wangxinjian1108/SkinTokens.git
+[submodule "thirdparty/GVHMR"]
+	path = thirdparty/GVHMR
+	url = git@github.com:wangxinjian1108/GVHMR.git
+[submodule "thirdparty/Motion2MixamoRig"]
+	path = thirdparty/Motion2MixamoRig
+	url = git@github.com:wangxinjian1108/Motion2MixamoRig.git
