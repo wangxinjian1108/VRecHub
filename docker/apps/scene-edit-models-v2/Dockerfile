@@ -35,6 +35,9 @@ COPY thirdparty/Motion2MixamoRig /app/Motion2MixamoRig
 # Motion2MixamoRig resolves its assets/, weights/ and outputs/ relative to the
 # project directory, so keep it editable and leave those folders writable.
 RUN conda run -n m2mr pip install --no-cache-dir --upgrade pip setuptools wheel \
+    && conda run -n m2mr pip install --no-cache-dir \
+        torch==2.7.0 torchvision==0.22.0 \
+        --index-url https://download.pytorch.org/whl/cu128 \
     && conda run -n m2mr pip install --no-cache-dir "numpy>=1.26" \
     && conda run -n m2mr pip install --no-cache-dir --no-build-isolation "chumpy==0.70" \
     && conda run -n m2mr pip install --no-cache-dir -e /app/Motion2MixamoRig \

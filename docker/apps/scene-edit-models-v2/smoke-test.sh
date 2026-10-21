@@ -35,6 +35,8 @@ conda run --no-capture-output -n m2mr python - <<'PY'
 import gvhmr
 import motion2mixamorig
 import torch
+# CUDA 13 wheels need a driver newer than the 12.x drivers used by these hosts.
+assert torch.version.cuda is not None and torch.version.cuda.startswith("12."), torch.version.cuda
 print("Motion2MixamoRig ready:", torch.__version__, "gvhmr", getattr(gvhmr, "__version__", "?"))
 PY
 conda run --no-capture-output -n m2mr m2mr --help >/dev/null
