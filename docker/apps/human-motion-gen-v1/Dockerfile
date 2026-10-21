@@ -76,10 +76,14 @@ ENV PATH=${CONDA_DIR}/bin:${PATH}
 # --------------------------------------------------------------------------
 # HY-Motion 1.0  (torch 2.5.1 / transformers 4.53.3 / diffusers 0.26.3)
 # --------------------------------------------------------------------------
+# diffusers 0.26 still imports huggingface_hub.cached_download, which the repo's
+# pinned hub 0.30 removed. 0.27.2 is the nearest API-compatible release
+# (DDIMScheduler is the only diffusers symbol HY-Motion uses).
 COPY thirdparty/HY-Motion-1.0 /app/HY-Motion-1.0
 RUN conda run -n hy-motion pip install --no-cache-dir --upgrade pip setuptools wheel \
     && conda run -n hy-motion pip install --no-cache-dir \
         -r /app/HY-Motion-1.0/requirements.txt \
+    && conda run -n hy-motion pip install --no-cache-dir "diffusers==0.27.2" \
     && conda run -n hy-motion pip check \
     && conda clean -afy
 
