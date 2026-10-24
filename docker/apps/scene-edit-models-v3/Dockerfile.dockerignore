@@ -1,0 +1,15 @@
+**
+!thirdparty/
+!thirdparty/kimodo/
+!thirdparty/kimodo/**
+!docker/
+!docker/apps/
+!docker/apps/scene-edit-models-v3/
+!docker/apps/scene-edit-models-v3/**
+**/.git
+**/__pycache__
+**/.venv
+**/.cache
+**/*.ckpt
+**/*.safetensors
+**/*.pth
