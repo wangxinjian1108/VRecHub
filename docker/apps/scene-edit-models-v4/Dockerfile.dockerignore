@@ -1,0 +1,15 @@
+**
+!thirdparty/
+!thirdparty/TRELLIS.2/
+!thirdparty/TRELLIS.2/**
+!docker/
+!docker/apps/
+!docker/apps/scene-edit-models-v4/
+!docker/apps/scene-edit-models-v4/**
+**/.git
+**/__pycache__
+**/.venv
+**/.cache
+**/*.ckpt
+**/*.safetensors
+**/*.pth

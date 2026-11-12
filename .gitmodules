@@ -82,3 +82,6 @@
 [submodule "thirdparty/DART"]
 	path = thirdparty/DART
 	url = git@github.com:wangxinjian1108/DART.git
+[submodule "thirdparty/TRELLIS.2"]
+	path = thirdparty/TRELLIS.2
+	url = git@github.com:wangxinjian1108/TRELLIS.2.git
