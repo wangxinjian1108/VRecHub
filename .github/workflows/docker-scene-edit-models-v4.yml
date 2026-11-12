@@ -32,7 +32,15 @@ jobs:
       - name: Init required submodule (TRELLIS.2 needs eigen)
         run: |
           git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf git@github.com:
-          git submodule update --init --recursive --depth 1 --jobs 2 thirdparty/TRELLIS.2
+          for attempt in 1 2 3; do
+            if git submodule update --init --recursive --depth 1 --jobs 2 thirdparty/TRELLIS.2; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep 15
+            fi
+          done
+          exit 1
 
       - name: Free disk space
         run: |
