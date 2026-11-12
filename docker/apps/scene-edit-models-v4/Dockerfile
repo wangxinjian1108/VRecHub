@@ -28,9 +28,12 @@ COPY thirdparty/TRELLIS.2 /app/TRELLIS.2
 RUN conda run -n trellis2 pip install --no-cache-dir \
         torch==2.6.0 torchvision==0.21.0 \
         --index-url https://download.pytorch.org/whl/cu124 \
+    && conda run -n trellis2 pip install --no-cache-dir --no-build-isolation \
+        "flash-attn==2.7.3" \
     && bash -lc 'source "${CONDA_DIR}/etc/profile.d/conda.sh" \
         && conda activate trellis2 \
         && cd /app/TRELLIS.2 \
+        && sed -i "/pip install pillow-simd/d" setup.sh \
         && . ./setup.sh --basic --flash-attn --nvdiffrast --nvdiffrec --cumesh --o-voxel --flexgemm' \
     && conda clean -afy
 
