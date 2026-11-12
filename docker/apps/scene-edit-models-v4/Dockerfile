@@ -12,6 +12,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
+ARG TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;9.0+PTX"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
     libopenexr-dev \
@@ -30,12 +32,14 @@ RUN conda run -n trellis2 pip install --no-cache-dir \
         --index-url https://download.pytorch.org/whl/cu124 \
     && conda run -n trellis2 pip install --no-cache-dir --no-build-isolation \
         "flash-attn==2.7.3" \
-    && bash -lc 'source "${CONDA_DIR}/etc/profile.d/conda.sh" \
+    && bash -lc 'set -euo pipefail \
+        && source "${CONDA_DIR}/etc/profile.d/conda.sh" \
         && conda activate trellis2 \
         && cd /app/TRELLIS.2 \
         && sed -i "/pip install pillow-simd/d" setup.sh \
         && sed -i "s/if command -v nvidia-smi > \\/dev\\/null; then/if true; then/" setup.sh \
         && . ./setup.sh --basic --flash-attn --nvdiffrast --nvdiffrec --cumesh --o-voxel --flexgemm' \
+    && conda run -n trellis2 pip check \
     && conda clean -afy
 
 COPY --chmod=755 docker/apps/scene-edit-models-v4/trellis2-python.sh /usr/local/bin/trellis2-python
