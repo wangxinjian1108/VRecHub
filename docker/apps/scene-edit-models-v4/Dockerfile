@@ -34,6 +34,7 @@ RUN conda run -n trellis2 pip install --no-cache-dir \
         && conda activate trellis2 \
         && cd /app/TRELLIS.2 \
         && sed -i "/pip install pillow-simd/d" setup.sh \
+        && sed -i "s/if command -v nvidia-smi > \\/dev\\/null; then/if true; then/" setup.sh \
         && . ./setup.sh --basic --flash-attn --nvdiffrast --nvdiffrec --cumesh --o-voxel --flexgemm' \
     && conda clean -afy
 
