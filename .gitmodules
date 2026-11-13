@@ -85,3 +85,9 @@
 [submodule "thirdparty/TRELLIS.2"]
 	path = thirdparty/TRELLIS.2
 	url = git@github.com:wangxinjian1108/TRELLIS.2.git
+[submodule "thirdparty/chois_release"]
+	path = thirdparty/chois_release
+	url = git@github.com:wangxinjian1108/chois_release.git
+[submodule "thirdparty/omomo_release"]
+	path = thirdparty/omomo_release
+	url = git@github.com:wangxinjian1108/omomo_release.git

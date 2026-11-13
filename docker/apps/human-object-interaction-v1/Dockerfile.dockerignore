@@ -1,0 +1,25 @@
+**
+!thirdparty/
+!thirdparty/chois_release/
+!thirdparty/chois_release/**
+!thirdparty/omomo_release/
+!thirdparty/omomo_release/**
+!thirdparty/kimodo/
+!thirdparty/kimodo/**
+!docker/
+!docker/apps/
+!docker/apps/human-object-interaction-v1/
+!docker/apps/human-object-interaction-v1/**
+**/.git
+**/__pycache__
+**/.venv
+**/.cache
+**/*.ckpt
+**/*.safetensors
+**/*.pth
+**/*.pt
+# Fixed random BPS basis points are input geometry, not learned weights.
+!thirdparty/chois_release/bps.pt
+!thirdparty/omomo_release/bps.pt
+**/pretrained_models
+**/checkpoints
