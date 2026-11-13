@@ -2,5 +2,5 @@
 !docker/
 !docker/apps/
 !docker/apps/human-object-interaction-v1-weights/
-!docker/apps/human-object-interaction-v1-weights/*.sh
+!docker/apps/human-object-interaction-v1-weights/**
 **/__pycache__

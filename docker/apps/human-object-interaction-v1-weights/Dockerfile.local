@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # Local final-image layer. The base environment is produced and validated by
 # GitHub Actions; model files are supplied from the host and never uploaded.
 FROM local/human-object-interaction-v1:base
@@ -19,5 +18,7 @@ RUN ln -sfn stage1/model.pt /models/omomo/stage1.pt \
 
 COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/chois-infer.sh /usr/local/bin/chois-infer
 COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/omomo-infer.sh /usr/local/bin/omomo-infer
+COPY docker/apps/human-object-interaction-v1-weights /opt/hoi-weights
+COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/smoke-test.sh /usr/local/bin/human-object-interaction-smoke-test
 
 CMD ["/bin/bash"]
