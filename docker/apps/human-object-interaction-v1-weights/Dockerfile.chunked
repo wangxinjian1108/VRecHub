@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1
+# A transfer image for networks that cannot resume a multi-gigabyte registry
+# blob. Each top-level COPY in the final scratch stage becomes a small OCI
+# layer, so the target machine can retry layers independently.
+FROM ghcr.io/wangxinjian1108/human-object-interaction-v1:with-weights AS source
+
+RUN mkdir -p /chunks \
+    && split -b 900M -d -a 2 \
+        /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00001-of-00004.safetensors \
+        /chunks/llama01. \
+    && split -b 900M -d -a 2 \
+        /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00002-of-00004.safetensors \
+        /chunks/llama02. \
+    && split -b 900M -d -a 2 \
+        /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00003-of-00004.safetensors \
+        /chunks/llama03. \
+    && split -b 900M -d -a 2 \
+        /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00004-of-00004.safetensors \
+        /chunks/llama04.
+
+FROM scratch
+
+COPY --from=source /chunks/llama01.00 /chunks/llama01.00
+COPY --from=source /chunks/llama01.01 /chunks/llama01.01
+COPY --from=source /chunks/llama01.02 /chunks/llama01.02
+COPY --from=source /chunks/llama01.03 /chunks/llama01.03
+COPY --from=source /chunks/llama01.04 /chunks/llama01.04
+COPY --from=source /chunks/llama01.05 /chunks/llama01.05
+
+COPY --from=source /chunks/llama02.00 /chunks/llama02.00
+COPY --from=source /chunks/llama02.01 /chunks/llama02.01
+COPY --from=source /chunks/llama02.02 /chunks/llama02.02
+COPY --from=source /chunks/llama02.03 /chunks/llama02.03
+COPY --from=source /chunks/llama02.04 /chunks/llama02.04
+COPY --from=source /chunks/llama02.05 /chunks/llama02.05
+
+COPY --from=source /chunks/llama03.00 /chunks/llama03.00
+COPY --from=source /chunks/llama03.01 /chunks/llama03.01
+COPY --from=source /chunks/llama03.02 /chunks/llama03.02
+COPY --from=source /chunks/llama03.03 /chunks/llama03.03
+COPY --from=source /chunks/llama03.04 /chunks/llama03.04
+COPY --from=source /chunks/llama03.05 /chunks/llama03.05
+
+COPY --from=source /chunks/llama04.00 /chunks/llama04.00
+COPY --from=source /chunks/llama04.01 /chunks/llama04.01
+
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/config.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/config.json
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/generation_config.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/generation_config.json
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model.safetensors.index.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model.safetensors.index.json
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/special_tokens_map.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/special_tokens_map.json
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer.json
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer_config.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/tokenizer_config.json
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/LICENSE /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/LICENSE
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/README.md /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/README.md
+COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/USE_POLICY.md /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/USE_POLICY.md
+COPY --from=source /models/text-encoders/McGill-NLP /weights/text-encoders/McGill-NLP
+COPY --from=source /models/kimodo /weights/kimodo
+COPY --from=source /models/clip /weights/clip
+COPY --from=source /models/chois /weights/chois
+COPY --from=source /models/omomo /weights/omomo
+COPY --from=source /models/weights-manifest.json /weights/weights-manifest.json
