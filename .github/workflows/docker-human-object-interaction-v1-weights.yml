@@ -1,16 +1,6 @@
-name: Docker – human-object-interaction-v1 with weights
+name: Docker – human-object-interaction-v1 with weights (manual)
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - "docker/apps/human-object-interaction-v1-weights/**"
-      - ".github/workflows/docker-human-object-interaction-v1-weights.yml"
-  pull_request:
-    branches: [master]
-    paths:
-      - "docker/apps/human-object-interaction-v1-weights/**"
-      - ".github/workflows/docker-human-object-interaction-v1-weights.yml"
   workflow_dispatch:
 
 jobs:

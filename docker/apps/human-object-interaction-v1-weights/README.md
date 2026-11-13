@@ -1,13 +1,31 @@
 # CHOIS + OMOMO + Kimodo 离线权重镜像
 
-通过 GitHub Actions 构建，继承已验证的无权重环境镜像，固定 base digest：
+无权重环境镜像通过 GitHub Actions 构建，固定 base digest：
 `sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2`。
-不需要在本机构建，也不需要 HTTP 文本编码服务。
+最终带权重镜像在目标机器上通过 `Dockerfile.local` 构建，避免把约 15 GiB
+权重层上传到 GitHub Packages。运行时也不需要 HTTP 文本编码服务。
 
 - GHCR：`ghcr.io/wangxinjian1108/human-object-interaction-v1:with-weights`
 - 固定构建标签：`weights-sha-<commit>`
 - 内网分发：`repo-volc.zelostech.com.cn/zcloud/human-object-interaction-v1:latest`
 - 无权重版的 GHCR `:latest` 保留。
+
+`docker-human-object-interaction-v1-weights.yml` 只保留为手动恢复路径；
+自动 CI 只维护 `docker-human-object-interaction-v1.yml` 中的基础环境。
+
+## 本机构建最终镜像
+
+先确认 `docker/apps/human-object-interaction-v1-weights/download-weights.py`
+生成的 `/models/weights-manifest.json` 存在，然后执行：
+
+```bash
+./docker/apps/human-object-interaction-v1-weights/build-local.sh \
+  /root/models/human-object-interaction-v1 \
+  repo-volc.zelostech.com.cn/zcloud/human-object-interaction-v1:latest
+```
+
+脚本把已从 GHCR 拉取的基础镜像标为 `local/human-object-interaction-v1:base`，
+再通过 BuildKit named context 只加入本机权重，不会从 GitHub 重新下载模型。
 
 | 模型 / 依赖 | 镜像内路径 |
 |---|---|

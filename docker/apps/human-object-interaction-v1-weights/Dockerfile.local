@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+# Local final-image layer. The base environment is produced and validated by
+# GitHub Actions; model files are supplied from the host and never uploaded.
+FROM local/human-object-interaction-v1:base
+
+COPY --from=weights / /models
+
+ENV CHECKPOINT_DIR=/models/kimodo \
+    TEXT_ENCODERS_DIR=/models/text-encoders \
+    TEXT_ENCODER_MODE=local \
+    LOCAL_CACHE=True \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    CLIP_MODEL_PATH=/models/clip/ViT-B-32.pt \
+    CLIP_DOWNLOAD_ROOT=/models/clip
+
+RUN ln -s /models/omomo/stage1/model.pt /models/omomo/stage1.pt \
+    && ln -s /models/omomo/stage2/model.pt /models/omomo/stage2.pt
+
+COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/chois-infer.sh /usr/local/bin/chois-infer
+COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/omomo-infer.sh /usr/local/bin/omomo-infer
+
+CMD ["/bin/bash"]
