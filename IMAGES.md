@@ -9,7 +9,7 @@
 | FoundationStereo | `ghcr.io/wangxinjian1108/foundationstereo` | 12.4 | 2.4.1 | [arXiv:2501.09898](https://arxiv.org/abs/2501.09898) | 立体匹配基础模型，CVPR 2025 Oral (Best Paper Nomination) |
 | hierarchical-3d-gaussians | `ghcr.io/wangxinjian1108/hierarchical-3d-gaussians` | 11.8 | 2.0.1 | [SIGGRAPH 2024](https://repo-sam.inria.fr/fungraph/hierarchical-3d-gaussians/) | 层次化 3D 高斯表示，超大规模场景实时渲染 |
 | human-motion-gen-v1 | `ghcr.io/wangxinjian1108/human-motion-gen-v1` | 12.8 | 2.5.1 / 2.1.0 | 聚合 HY-Motion-1.0 / ARDY / Kimodo / DART | 人体动作生成：四个模型各自独立 conda env，含 torch 2.1~2.5，不含模型权重 |
-| human-object-interaction-v1 | `ghcr.io/wangxinjian1108/human-object-interaction-v1` | SDK 12.8 / runtime 11.3、12.4 | 1.11.0 / 2.5.1 | 聚合 CHOIS / OMOMO / Kimodo | 人体与物体交互及动作生成：CHOIS、OMOMO 共用 hoi env，Kimodo 独立 env，含 Blender 3.6.3，不含预训练权重 |
+| human-object-interaction-v1 | `ghcr.io/wangxinjian1108/human-object-interaction-v1` | SDK 12.8 / runtime 11.3、12.4 | 1.11.0 / 2.5.1 | 聚合 CHOIS / OMOMO / Kimodo | 人体与物体交互及动作生成：CHOIS、OMOMO 共用 hoi env，Kimodo 独立 env，含 Blender 3.6.3；`:latest` 无权重，另提供 [`:with-weights`](docker/apps/human-object-interaction-v1-weights/README.md) 离线权重版 |
 | lingbot-map | `ghcr.io/wangxinjian1108/lingbot-map` | 12.8 | 2.8.0 | [arXiv:2604.14141](https://arxiv.org/abs/2604.14141) | 语言引导的建图方法 |
 | LoGeR | `ghcr.io/wangxinjian1108/loger` | 12.6 | 2.6.0 | [arXiv:2603.03269](https://arxiv.org/abs/2603.03269) | 长上下文几何重建，混合记忆机制 |
 | map-anything | `ghcr.io/wangxinjian1108/map-anything` | 12.6 | latest | [arXiv:2509.13414](https://arxiv.org/abs/2509.13414) | 通用语义建图 (Meta Research) |
