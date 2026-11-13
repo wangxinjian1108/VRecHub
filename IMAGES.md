@@ -34,4 +34,4 @@
 | vrec-models-v1 | `ghcr.io/wangxinjian1108/vrec-models-v1` | 12.8 | mixed | 聚合多模型，参考各成员论文 | 聚合推理镜像：Fast-FoundationStereo + Pi3 + vggt-omega + sam3，4 个独立 conda env 共存于一镜像 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 27 个镜像，22 篇独立论文（聚合镜像中的 CHOIS、OMOMO 等论文另见各模型仓库）。
+共 31 个镜像，22 篇独立论文（聚合镜像中的 CHOIS、OMOMO 等论文另见各模型仓库）。
