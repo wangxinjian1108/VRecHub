@@ -5,16 +5,16 @@
 FROM ghcr.io/wangxinjian1108/human-object-interaction-v1:with-weights AS source
 
 RUN mkdir -p /chunks \
-    && split -b 900M -d -a 2 \
+    && split -b 400M -d -a 2 \
         /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00001-of-00004.safetensors \
         /chunks/llama01. \
-    && split -b 900M -d -a 2 \
+    && split -b 400M -d -a 2 \
         /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00002-of-00004.safetensors \
         /chunks/llama02. \
-    && split -b 900M -d -a 2 \
+    && split -b 400M -d -a 2 \
         /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00003-of-00004.safetensors \
         /chunks/llama03. \
-    && split -b 900M -d -a 2 \
+    && split -b 400M -d -a 2 \
         /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/model-00004-of-00004.safetensors \
         /chunks/llama04.
 
@@ -26,6 +26,12 @@ COPY --from=source /chunks/llama01.02 /chunks/llama01.02
 COPY --from=source /chunks/llama01.03 /chunks/llama01.03
 COPY --from=source /chunks/llama01.04 /chunks/llama01.04
 COPY --from=source /chunks/llama01.05 /chunks/llama01.05
+COPY --from=source /chunks/llama01.06 /chunks/llama01.06
+COPY --from=source /chunks/llama01.07 /chunks/llama01.07
+COPY --from=source /chunks/llama01.08 /chunks/llama01.08
+COPY --from=source /chunks/llama01.09 /chunks/llama01.09
+COPY --from=source /chunks/llama01.10 /chunks/llama01.10
+COPY --from=source /chunks/llama01.11 /chunks/llama01.11
 
 COPY --from=source /chunks/llama02.00 /chunks/llama02.00
 COPY --from=source /chunks/llama02.01 /chunks/llama02.01
@@ -33,6 +39,12 @@ COPY --from=source /chunks/llama02.02 /chunks/llama02.02
 COPY --from=source /chunks/llama02.03 /chunks/llama02.03
 COPY --from=source /chunks/llama02.04 /chunks/llama02.04
 COPY --from=source /chunks/llama02.05 /chunks/llama02.05
+COPY --from=source /chunks/llama02.06 /chunks/llama02.06
+COPY --from=source /chunks/llama02.07 /chunks/llama02.07
+COPY --from=source /chunks/llama02.08 /chunks/llama02.08
+COPY --from=source /chunks/llama02.09 /chunks/llama02.09
+COPY --from=source /chunks/llama02.10 /chunks/llama02.10
+COPY --from=source /chunks/llama02.11 /chunks/llama02.11
 
 COPY --from=source /chunks/llama03.00 /chunks/llama03.00
 COPY --from=source /chunks/llama03.01 /chunks/llama03.01
@@ -40,9 +52,16 @@ COPY --from=source /chunks/llama03.02 /chunks/llama03.02
 COPY --from=source /chunks/llama03.03 /chunks/llama03.03
 COPY --from=source /chunks/llama03.04 /chunks/llama03.04
 COPY --from=source /chunks/llama03.05 /chunks/llama03.05
+COPY --from=source /chunks/llama03.06 /chunks/llama03.06
+COPY --from=source /chunks/llama03.07 /chunks/llama03.07
+COPY --from=source /chunks/llama03.08 /chunks/llama03.08
+COPY --from=source /chunks/llama03.09 /chunks/llama03.09
+COPY --from=source /chunks/llama03.10 /chunks/llama03.10
+COPY --from=source /chunks/llama03.11 /chunks/llama03.11
 
 COPY --from=source /chunks/llama04.00 /chunks/llama04.00
 COPY --from=source /chunks/llama04.01 /chunks/llama04.01
+COPY --from=source /chunks/llama04.02 /chunks/llama04.02
 
 COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/config.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/config.json
 COPY --from=source /models/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/generation_config.json /weights/text-encoders/meta-llama/Meta-Llama-3-8B-Instruct/generation_config.json
