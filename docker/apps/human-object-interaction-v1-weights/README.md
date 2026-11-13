@@ -27,6 +27,18 @@
 脚本把已从 GHCR 拉取的基础镜像标为 `local/human-object-interaction-v1:base`，
 再通过 BuildKit named context 只加入本机权重，不会从 GitHub 重新下载模型。
 
+网络无法稳定续传单一大层时，先拉取已拆成约 900 MiB OCI 层的权重传输镜像，
+再合并并逐文件校验：
+
+```bash
+./docker/apps/human-object-interaction-v1-weights/materialize-weights.sh \
+  /root/models/human-object-interaction-v1
+```
+
+需要为本机、Zelos 内网或推理使用方单独同步较大权重时，可拉取
+`ghcr.io/wangxinjian1108/human-object-interaction-v1-weights-chunks:latest`；
+该镜像不是推理环境，只保存可逐层续传的权重分块。
+
 | 模型 / 依赖 | 镜像内路径 |
 |---|---|
 | CHOIS 官方 model-10.pt | `/models/chois/model-10.pt` |
