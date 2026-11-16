@@ -1,5 +1,8 @@
 # CHOIS + OMOMO + Kimodo 离线权重镜像
 
+完整的拉取、挂载、自检和三个模型的推理说明见
+[USAGE.md](USAGE.md)。
+
 无权重环境镜像通过 GitHub Actions 构建，固定 base digest：
 `sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2`。
 最终带权重镜像在目标机器上通过 `Dockerfile.local` 构建，避免把约 15 GiB
