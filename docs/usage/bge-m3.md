@@ -6,6 +6,12 @@
 ghcr.io/wangxinjian1108/bge-m3:latest
 ```
 
+Zelos 内网镜像：
+
+```text
+repo-volc.zelostech.com.cn/zcloud/bge-m3:latest
+```
+
 镜像内置 `BAAI/bge-m3` 的 PyTorch 权重，无需运行时下载模型，也不需要
 vLLM、GPU 或 NVIDIA Container Toolkit。
 
