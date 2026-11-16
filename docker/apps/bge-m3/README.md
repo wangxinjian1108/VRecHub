@@ -37,3 +37,6 @@ curl -sS http://127.0.0.1:8000/embed \
 
 完整接口、CLI 和部署说明见
 [BGE-M3 使用与推理指南](../../../docs/usage/bge-m3.md)。
+
+需要 CUDA 推理时使用独立的
+[`bge-m3-gpu`](../bge-m3-gpu/README.md) 镜像。

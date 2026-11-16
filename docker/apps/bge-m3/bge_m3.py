@@ -10,14 +10,26 @@ class BgeM3Encoder:
     def __init__(self):
         self.model_path = os.environ.get("BGE_M3_MODEL_PATH", "/models/bge-m3")
         self.device = os.environ.get("BGE_M3_DEVICE", "cpu")
+        self.use_fp16 = os.environ.get("BGE_M3_USE_FP16", "false").lower() in {
+            "1",
+            "true",
+            "yes",
+        }
         self.batch_size = int(os.environ.get("BGE_M3_BATCH_SIZE", "8"))
         self.default_max_length = int(os.environ.get("BGE_M3_MAX_LENGTH", "8192"))
         self.max_texts = int(os.environ.get("BGE_M3_MAX_TEXTS", "128"))
+        if self.device.startswith("cuda") and not torch.cuda.is_available():
+            raise RuntimeError(
+                "BGE_M3_DEVICE requests CUDA, but torch.cuda.is_available() is false. "
+                "Use the bge-m3-gpu image and run Docker with --gpus all."
+            )
+        if self.device == "cpu" and self.use_fp16:
+            raise RuntimeError("BGE_M3_USE_FP16=true requires a CUDA device")
         torch.set_num_threads(int(os.environ.get("OMP_NUM_THREADS", "4")))
         self._lock = threading.Lock()
         self.model = BGEM3FlagModel(
             self.model_path,
-            use_fp16=False,
+            use_fp16=self.use_fp16,
             devices=self.device,
             batch_size=self.batch_size,
             passage_max_length=self.default_max_length,

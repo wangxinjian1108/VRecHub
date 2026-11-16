@@ -9,6 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     OMP_NUM_THREADS=4 \
     BGE_M3_MODEL_PATH=/models/bge-m3 \
     BGE_M3_DEVICE=cpu \
+    BGE_M3_USE_FP16=false \
     BGE_M3_BATCH_SIZE=8 \
     BGE_M3_MAX_LENGTH=8192 \
     BGE_M3_MAX_TEXTS=128 \
@@ -42,6 +43,6 @@ RUN python /app/smoke-test.py
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD python -c "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:8000/health'))['status'] == 'ok'"
+    CMD python3 -c "import json,urllib.request; assert json.load(urllib.request.urlopen('http://127.0.0.1:8000/health'))['status'] == 'ok'"
 
 CMD ["bge-m3-server"]

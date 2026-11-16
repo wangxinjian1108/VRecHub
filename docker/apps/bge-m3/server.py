@@ -23,13 +23,22 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            self._send(200, {"status": "ok", "model": "BAAI/bge-m3"})
+            self._send(
+                200,
+                {
+                    "status": "ok",
+                    "model": "BAAI/bge-m3",
+                    "device": ENCODER.device,
+                    "fp16": ENCODER.use_fp16,
+                },
+            )
         elif self.path == "/info":
             self._send(
                 200,
                 {
                     "model": "BAAI/bge-m3",
                     "device": ENCODER.device,
+                    "fp16": ENCODER.use_fp16,
                     "dense_dimension": 1024,
                     "default_max_length": ENCODER.default_max_length,
                     "default_batch_size": ENCODER.batch_size,
@@ -83,7 +92,11 @@ def main():
     host = os.environ.get("BGE_M3_HOST", "0.0.0.0")
     port = int(os.environ.get("BGE_M3_PORT", "8000"))
     server = ThreadingHTTPServer((host, port), Handler)
-    print(f"BGE-M3 server listening on http://{host}:{port}", flush=True)
+    print(
+        f"BGE-M3 server listening on http://{host}:{port} "
+        f"(device={ENCODER.device}, fp16={ENCODER.use_fp16})",
+        flush=True,
+    )
     server.serve_forever()
 
 

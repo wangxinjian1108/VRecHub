@@ -1,0 +1,8 @@
+**
+!docker/
+!docker/apps/
+!docker/apps/bge-m3/
+!docker/apps/bge-m3/**
+!docker/apps/bge-m3-gpu/
+!docker/apps/bge-m3-gpu/**
+**/__pycache__

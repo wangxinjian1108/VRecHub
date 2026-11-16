@@ -15,6 +15,9 @@ repo-volc.zelostech.com.cn/zcloud/bge-m3:latest
 镜像内置 `BAAI/bge-m3` 的 PyTorch 权重，无需运行时下载模型，也不需要
 vLLM、GPU 或 NVIDIA Container Toolkit。
 
+需要 GPU 推理时使用
+[bge-m3-gpu.md](bge-m3-gpu.md)。
+
 ## 1. 支持能力
 
 BGE-M3 可以返回三种表示：
@@ -65,7 +68,7 @@ curl -sS http://127.0.0.1:8000/health
 返回：
 
 ```json
-{"status":"ok","model":"BAAI/bge-m3"}
+{"status":"ok","model":"BAAI/bge-m3","device":"cpu","fp16":false}
 ```
 
 查看模型信息：
@@ -301,5 +304,5 @@ BGE_M3_MAX_LENGTH
 
 ### 想要 GPU 加速
 
-当前镜像为了控制体积使用 CPU-only PyTorch。GPU 版本需要改用 CUDA 基础镜像和
-对应 PyTorch wheel，可另建 `bge-m3-gpu` 镜像。
+当前 CPU 镜像使用 CPU-only PyTorch。GPU 加速请使用
+[bge-m3-gpu.md](bge-m3-gpu.md) 中描述的独立镜像。
