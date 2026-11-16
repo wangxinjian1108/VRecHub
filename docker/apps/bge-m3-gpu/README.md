@@ -1,6 +1,6 @@
 # BGE-M3 GPU 推理镜像
 
-基于 CUDA 12.4 和 PyTorch 2.5.1 cu124 的 BGE-M3 GPU 推理镜像。
+基于 CUDA 12.4 和 PyTorch 2.6.0 cu124 的 BGE-M3 GPU 推理镜像。
 
 ```text
 ghcr.io/wangxinjian1108/bge-m3-gpu:latest

@@ -27,7 +27,7 @@ RUN python3 -m pip install --upgrade pip setuptools wheel \
     && python3 -m pip install \
         --index-url https://download.pytorch.org/whl/cu124 \
         --extra-index-url https://pypi.org/simple \
-        "torch==2.5.1+cu124" \
+        "torch==2.6.0+cu124" \
     && python3 -m pip install -r /tmp/requirements.txt \
     && python3 -c "import torch; assert torch.backends.cuda.is_built(); assert torch.version.cuda == '12.4', torch.version.cuda"
 

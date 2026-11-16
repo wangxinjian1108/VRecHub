@@ -4,7 +4,7 @@
 |------|------------|------|---------|------|------|
 | C4G | `ghcr.io/wangxinjian1108/c4g` | 12.1 | 2.2.0 | [Project Page](https://cvlab-kaist.github.io/C4G) | 紧凑高斯学习全局运动，前馈式 4D 重建 (KAIST + ETH + Sony AI) |
 | bge-m3 | `ghcr.io/wangxinjian1108/bge-m3` | CPU-only | 2.6.0 | [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) | 小型 BGE-M3 embedding 推理镜像，内置 PyTorch 权重和 HTTP/CLI 入口，支持 dense / sparse / ColBERT |
-| bge-m3-gpu | `ghcr.io/wangxinjian1108/bge-m3-gpu` | 12.4 | 2.5.1 cu124 | [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) | BGE-M3 GPU embedding 推理镜像，内置权重，默认 CUDA/FP16，支持 dense / sparse / ColBERT |
+| bge-m3-gpu | `ghcr.io/wangxinjian1108/bge-m3-gpu` | 12.4 | 2.6.0 cu124 | [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) | BGE-M3 GPU embedding 推理镜像，内置权重，默认 CUDA/FP16，支持 dense / sparse / ColBERT |
 | colmap | `ghcr.io/wangxinjian1108/colmap` | 12.6 | latest | [CVPR 2016](https://demuc.de/papers/schoenberger2016sfm.pdf) | Structure-from-Motion 和 Multi-View Stereo 管道 |
 | dvlt | `ghcr.io/wangxinjian1108/dvlt` | 12.4 | 2.5.1 | [arXiv:2605.30215](https://arxiv.org/abs/2605.30215) | Déjà View：循环 Transformer 用于多视角 3D 重建 (NVIDIA) |
 | Fast-FoundationStereo | `ghcr.io/wangxinjian1108/fast-foundationstereo` | 12.4 | 2.6.0 | [arXiv:2512.11130](https://arxiv.org/abs/2512.11130) | Fast-FoundationStereo：实时零样本立体匹配，CVPR 2026 (NVIDIA) |

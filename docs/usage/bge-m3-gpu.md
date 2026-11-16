@@ -11,7 +11,7 @@ CPU 镜像见 [bge-m3.md](bge-m3.md)。
 ## 1. 环境
 
 - CUDA base：12.4.1 cuDNN runtime。
-- PyTorch：`2.5.1+cu124`。
+- PyTorch：`2.6.0+cu124`。
 - 默认设备：`cuda`。
 - 默认精度：FP16。
 - 模型：`BAAI/bge-m3@5617a9f61b028005a4858fdac845db406aefb181`。
