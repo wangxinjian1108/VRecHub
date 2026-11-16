@@ -1,7 +1,7 @@
 # CHOIS + OMOMO + Kimodo 离线权重镜像
 
 完整的拉取、挂载、自检和三个模型的推理说明见
-[USAGE.md](USAGE.md)。
+[human-object-interaction-v1 使用与推理指南](../../../docs/usage/human-object-interaction-v1.md)。
 
 无权重环境镜像通过 GitHub Actions 构建，固定 base digest：
 `sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2`。

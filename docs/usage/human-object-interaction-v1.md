@@ -329,7 +329,7 @@ CHOIS 需要上游预处理数据，而不是单张图片或单个 GLB。默认�
 
 人体模型需要从官方许可渠道自行准备，镜像不包含 SMPL-H/SMPL-X 文件。
 数据构建方法见
-[CHOIS 上游 README](../../../thirdparty/chois_release/README.md)。
+[CHOIS 上游 README](../../thirdparty/chois_release/README.md)。
 
 ### 8.2 单窗口推理
 
@@ -425,7 +425,7 @@ OMOMO 测试数据默认应位于：
 ```
 
 数据和可视化说明见
-[OMOMO 上游 README](../../../thirdparty/omomo_release/README.md)。
+[OMOMO 上游 README](../../thirdparty/omomo_release/README.md)。
 
 ### 9.2 标准两阶段推理
 
