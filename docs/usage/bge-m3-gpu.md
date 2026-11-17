@@ -175,3 +175,20 @@ docker run --rm --gpus '"device=1"' \
 - 中小吞吐、没有 GPU：使用 `bge-m3:latest`。
 - 批量编码、需要低延迟：使用 `bge-m3-gpu:latest`。
 - 多副本部署时应根据显存、最大 token 长度和 batch size 评估并发。
+
+## 8. 验证记录
+
+本次 GitHub Actions 构建镜像：
+
+```text
+ghcr.io/wangxinjian1108/bge-m3-gpu:latest
+digest: sha256:d183bb60792b260f68e5ca2c0485e2b6b43428645210a113782d0a00152ceb20
+```
+
+已在 NVIDIA L4 上完成：
+
+- `torch.cuda.is_available() == true`。
+- PyTorch 编译 CUDA 版本为 12.4。
+- Dense、sparse 和 ColBERT GPU embedding 全部通过。
+- GPU HTTP `/health` 和 `/embed` 请求通过。
+- 中文文本返回 1024 维 embedding，L2 范数约为 1。
