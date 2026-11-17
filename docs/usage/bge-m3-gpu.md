@@ -6,6 +6,12 @@ GPU 镜像：
 ghcr.io/wangxinjian1108/bge-m3-gpu:latest
 ```
 
+Zelos 内网镜像：
+
+```text
+repo-volc.zelostech.com.cn/zcloud/bge-m3-gpu:latest
+```
+
 CPU 镜像见 [bge-m3.md](bge-m3.md)。
 
 ## 1. 环境
