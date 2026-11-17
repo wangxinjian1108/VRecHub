@@ -38,5 +38,8 @@ curl -sS http://127.0.0.1:8000/embed \
 完整接口、CLI 和部署说明见
 [BGE-M3 使用与推理指南](../../../docs/usage/bge-m3.md)。
 
+若要扩展成输入 prompt、查询 N 条向量并返回 top-k 的搜索服务，见
+[BGE-M3 Embedding 与相似度检索服务指南](../../../docs/usage/bge-m3-search-service.md)。
+
 需要 CUDA 推理时使用独立的
 [`bge-m3-gpu`](../bge-m3-gpu/README.md) 镜像。

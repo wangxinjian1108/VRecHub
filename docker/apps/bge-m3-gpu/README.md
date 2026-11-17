@@ -31,3 +31,6 @@ docker run --rm --gpus all \
 
 完整说明见
 [BGE-M3 GPU 使用指南](../../../docs/usage/bge-m3-gpu.md)。
+
+若要把 embedding 服务接入 pgvector/Qdrant 并返回 prompt 的 top-k 相似结果，见
+[BGE-M3 Embedding 与相似度检索服务指南](../../../docs/usage/bge-m3-search-service.md)。

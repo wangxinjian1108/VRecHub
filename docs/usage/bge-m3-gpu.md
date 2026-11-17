@@ -12,7 +12,8 @@ Zelos 内网镜像：
 repo-volc.zelostech.com.cn/zcloud/bge-m3-gpu:latest
 ```
 
-CPU 镜像见 [bge-m3.md](bge-m3.md)。
+CPU 镜像见 [bge-m3.md](bge-m3.md)。Prompt 搜索服务、向量数据库和 `/search`
+扩展方案见 [BGE-M3 相似度检索服务指南](bge-m3-search-service.md)。
 
 ## 1. 环境
 

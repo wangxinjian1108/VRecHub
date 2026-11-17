@@ -16,7 +16,9 @@ repo-volc.zelostech.com.cn/zcloud/bge-m3:latest
 vLLM、GPU 或 NVIDIA Container Toolkit。
 
 需要 GPU 推理时使用
-[bge-m3-gpu.md](bge-m3-gpu.md)。
+[bge-m3-gpu.md](bge-m3-gpu.md)。如果要扩展成“输入 prompt，与数据库中
+N 条 embedding 比较并返回 top-k”的检索服务，见
+[BGE-M3 Embedding 与相似度检索服务指南](bge-m3-search-service.md)。
 
 ## 1. 支持能力
 
