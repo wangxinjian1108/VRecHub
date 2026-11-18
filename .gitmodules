@@ -91,3 +91,6 @@
 [submodule "thirdparty/omomo_release"]
 	path = thirdparty/omomo_release
 	url = git@github.com:wangxinjian1108/omomo_release.git
+[submodule "thirdparty/Pi4"]
+	path = thirdparty/Pi4
+	url = https://github.com/wangxinjian1108/Pi4.git

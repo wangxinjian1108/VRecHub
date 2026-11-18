@@ -18,6 +18,7 @@
 | Open-d4rt | `ghcr.io/wangxinjian1108/open-d4rt` | 12.4 | 2.6.0 | [Project Page](https://d4rt-paper.github.io/) | D4RT 非官方实现：4D 重建与跟踪 (RHOS Team / SJTU MVIG) |
 | Pi-Long | `ghcr.io/wangxinjian1108/pi-long` | 11.8 | 2.5.1 | 无独立论文，参考 [VGGT-Long](https://arxiv.org/abs/2507.16443) + [Pi3](https://arxiv.org/abs/2507.13347) | 基于 VGGT-Long 和 Pi3 的长序列重建 |
 | Pi3 | `ghcr.io/wangxinjian1108/pi3` | 12.4 | 2.5.1 | [arXiv:2507.13347](https://arxiv.org/abs/2507.13347) | 可扩展的置换等变视觉几何学习 |
+| Pi4 | `ghcr.io/wangxinjian1108/pi4` | 12.6 | 2.12.1 cu126 | [arXiv:2611.23144](https://arxiv.org/abs/2611.23144) | 单图、多视图和视频的 4D 场景几何及运动推理；权重需另行下载 |
 | Qwen3-VL | `ghcr.io/wangxinjian1108/qwen3-vl` | 12.8 | latest | [arXiv:2511.21631](https://arxiv.org/abs/2511.21631) | Qwen3 视觉语言模型：多模态推理、OCR、视频理解 (Alibaba Qwen) |
 | sam3 | `ghcr.io/wangxinjian1108/sam3` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | Segment Anything with Concepts (Meta AI) |
 | sam3-train | `ghcr.io/wangxinjian1108/sam3-train` | 12.8 | 2.10.0 | [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) | sam3 训练镜像：基于 sam3:latest + `[train]` extras (hydra-core / submitit / tensorboard / fvcore / fairscale / torchmetrics 等) |
@@ -36,4 +37,4 @@
 | vrec-models-v1 | `ghcr.io/wangxinjian1108/vrec-models-v1` | 12.8 | mixed | 聚合多模型，参考各成员论文 | 聚合推理镜像：Fast-FoundationStereo + Pi3 + vggt-omega + sam3，4 个独立 conda env 共存于一镜像 |
 | ZipMap | `ghcr.io/wangxinjian1108/zipmap` | 12.6 | 2.6.0 | [arXiv:2603.04385](https://arxiv.org/abs/2603.04385) | 线性时间有状态 3D 重建 (Google Research) |
 
-共 33 个镜像，22 篇独立论文（聚合镜像中的 CHOIS、OMOMO 等论文另见各模型仓库）。
+共 34 个镜像，23 篇独立论文（聚合镜像中的 CHOIS、OMOMO 等论文另见各模型仓库）。

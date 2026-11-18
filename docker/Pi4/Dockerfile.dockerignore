@@ -1,0 +1,7 @@
+**
+!thirdparty/
+!thirdparty/Pi4/
+!thirdparty/Pi4/**
+thirdparty/Pi4/.git
+thirdparty/Pi4/**/__pycache__/
+thirdparty/Pi4/**/.git/
