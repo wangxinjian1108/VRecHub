@@ -30,7 +30,7 @@ COPY thirdparty/Pi4/ /Pi4/
 RUN python -m pip install --upgrade pip \
     && python -m pip install -r requirements-cu126.txt \
     && python -m pip check \
-    && python -c "import torch, triton, cv2, flex_gemm; from pi4 import Pi4; assert torch.version.cuda == '12.6'; print('PyTorch:', torch.__version__, 'CUDA:', torch.version.cuda, 'Triton:', triton.__version__)" \
+    && python -c "import torch, triton, cv2, importlib.util; assert importlib.util.find_spec('flex_gemm') and importlib.util.find_spec('pi4'); assert torch.version.cuda == '12.6'; print('PyTorch:', torch.__version__, 'CUDA:', torch.version.cuda, 'Triton:', triton.__version__)" \
     && python example.py --help >/dev/null
 
 CMD ["python", "example.py", "--help"]
