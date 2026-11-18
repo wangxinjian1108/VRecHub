@@ -37,3 +37,17 @@ docker run --rm -p 8080:8080 -v "$PWD/pi4-work:/work" \
 ```
 
 完整输入、输出和性能说明见 submodule 的 `thirdparty/Pi4/docs/inference.md`。
+
+## 带权重的离线镜像
+
+`ghcr.io/wangxinjian1108/pi4:with-weights` 包含官方 `yyfz233/Pi4` 权重，
+文件为 `/models/Pi4/model.safetensors`，并预填充 Hugging Face 缓存。镜像设置
+`HF_HUB_OFFLINE=1`，上面的推理命令无需下载权重；也可显式指定
+`--weights /models/Pi4/model.safetensors`。权重版本为
+`59f307317fb630c9c5a5aa635038d98ed106aaf5`，SHA-256 为
+`fefacac1fb3d23d33c628c41f40d3ce3be98ca064c271948371805db7b5a0e69`。
+
+Zelos 内网带权重镜像：`repo-volc.zelostech.com.cn/zcloud/pi4:latest`。
+运行时将上面示例的镜像地址替换为该地址即可。不要把空目录挂载到容器的
+`/root/.cache/huggingface`，否则会覆盖预填充缓存；如需挂载该目录，
+请显式指定 `--weights /models/Pi4/model.safetensors`。
