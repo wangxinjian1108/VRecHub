@@ -21,6 +21,15 @@ if ! docker run --rm --network none \
     result=1
 fi
 
+echo 'Checking Blender headless rendering'
+if ! docker run --rm --network none \
+    -v "$repo_root/scripts/hoi/check_blender.py:/tmp/check_blender.py:ro" \
+    --entrypoint /opt/blender/blender "$image" \
+    --background -noaudio --python-exit-code 1 --python /tmp/check_blender.py; then
+    echo 'Blender headless render failed.' >&2
+    result=1
+fi
+
 for env_name in hoi light interact haic grail; do
     if [[ "$env_name" == grail ]]; then
         python_bin=/root/miniconda3/envs/grail/bin/python

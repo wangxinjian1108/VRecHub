@@ -22,6 +22,10 @@ CHOIS 测试同时加载镜像内的 CLIP 权重，对文本 `a person carries a
 上游预处理数据和经许可获取的 SMPL-H / SMPL-X 模型，见
 [V1 使用说明](human-object-interaction-v1.md)。
 
+2026-11-25 还在上述 V1 镜像中验证了 `hoi` 环境的 PyTorch3D CUDA 最近邻
+算子：NVIDIA L4 上通过，PyTorch 为 1.11.0，使用 CUDA 11.3 构建。V2
+完整镜像的同项检查需要等其拉取完成后单独运行。
+
 在仓库根目录可用以下命令复现 CHOIS 测试：
 
 ```bash
@@ -67,3 +71,18 @@ docker run --rm --gpus all --network none --shm-size=4g \
 测试 object-split 权重时，分别将两个权重路径替换为
 `/models/omomo/stage1_object_split/model.pt` 和
 `/models/omomo/stage2_object_split/model.pt`。
+
+## Blender 无头渲染
+
+2026-11-25，使用上述带权重的 V1 镜像，在无网络容器中运行 Blender 3.6.3
+的 CPU Cycles 渲染，并检查生成的 64 × 64 PNG 的尺寸和图像内容，结果通过。
+这项检查也已加入 V2 候选镜像的本机验证脚本；V2 的完整容器结果以该脚本
+实际运行结果为准。
+
+```bash
+docker run --rm --network none \
+  -v "$PWD/scripts/hoi/check_blender.py:/tmp/check_blender.py:ro" \
+  --entrypoint /opt/blender/blender \
+  repo-volc.zelostech.com.cn/zcloud/human-object-interaction-v1:latest \
+  --background -noaudio --python-exit-code 1 --python /tmp/check_blender.py
+```
