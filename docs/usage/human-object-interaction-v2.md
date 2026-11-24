@@ -2,13 +2,14 @@
 
 该候选镜像通过 GitHub Actions 构建和组合，包含 LIGHT、InterAct、GRAIL、
 HAIC、CHOIS、OMOMO、Kimodo 和 Blender。候选镜像的清单与各来源层已核对；
-完整容器验证结果应以 Actions 的检查任务为准，不应把候选版本视为已验证的
-正式发布。
+验证范围和已知问题如下，候选版本尚未作为正式版本发布。
 
-本机检查发现下方旧候选镜像继承了 `/workspace/grail` 匿名卷声明，创建容器时
-Docker 会复制该目录并额外占用大量空间；修正后的候选镜像尚在构建。另外，
-本机 NVIDIA 驱动 550.144.03 不满足该镜像的 `cuda>=12.8` 启动检查，GPU
-运行需要兼容的驱动；不要将 CPU 检查通过视为 GPU 推理通过。
+下方候选镜像已移除继承的 `/workspace/grail` 匿名卷声明。本机完整镜像的
+CPU 环境和 Blender 渲染检查通过；本机 NVIDIA 驱动 550.144.03 不满足镜像
+的 `cuda>=12.8` 启动检查，GPU 运行需要兼容的驱动。临时绕过该门槛的
+基础 CUDA 检查中，HOI、LIGHT、InterAct 和 HAIC 通过；GRAIL 的
+`nvdiffrast` 仅含 `sm_120` 内核，在本机 L4（`sm_89`）上失败，修正层正在构建。
+这些基础检查不等于真实数据上的推理或仿真通过。
 
 目前已在 GitHub Actions 中用相同的四个环境层验证 CHOIS、OMOMO、
 Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
@@ -20,7 +21,7 @@ Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；
 详见 [检查记录](https://github.com/wangxinjian1108/VRecHub/actions/runs/45419274165)。
 
 ```text
-ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7
+ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1
 ```
 
 压缩镜像层约 59.8 GiB，解压和运行还需要额外空间。GRAIL 上游测试环境为
@@ -35,12 +36,12 @@ SMPL-H／SMPL-X 人体模型。各模型还需要按上游说明准备对应 che
 ## 启动与环境
 
 ```bash
-docker pull ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7
+docker pull ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1
 
 docker run --rm -it --gpus all --shm-size=16g \
   -v /data/hoi-models:/models \
   -v /data/hoi-output:/outputs \
-  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7 \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1 \
   bash
 ```
 
@@ -72,8 +73,12 @@ GRAIL 的 GEM-X 环境位于 `/root/.cache/grail/envs/gem-x`，不要将宿主�
 - **GRAIL**：从 `/workspace/grail` 使用 `/root/miniconda3` 中的 `grail`
   环境。权重、示例数据与完整工作流见
   [GRAIL 下载说明](https://github.com/NVlabs/GRAIL/blob/main/docs/source/downloads.md)。
-- **HAIC**：从 `/app/HAIC` 使用 `haic` 环境运行上游 `scripts/play.py`；
-  需提供与任务相匹配的策略 checkpoint、仿真数据和兼容 Isaac Sim 的 GPU／驱动。
+- **HAIC**：从 `/app/HAIC` 使用 `haic` 环境运行上游 `scripts/play.py`，例如
+  `python scripts/play.py algo=ppo_haic_train task=G1/haic/skateboard checkpoint_path=/models/haic/checkpoint.pt`；
+  上游默认的 `G1/G1Track-walk` 配置不存在，应明确指定任务和算法。需提供与任务
+  匹配的策略 checkpoint、仿真数据和兼容 Isaac Sim 的 GPU／驱动。当前环境中的
+  TorchRL 0.7 C++ 扩展与 PyTorch 2.7 不兼容，导入会警告；部分功能（例如优先经验
+  回放）不可用，完整仿真尚未验证。
   参见 [HAIC 上游说明](https://github.com/ldt29/HAIC)。
 - **CHOIS 和 OMOMO**：入口分别为 `chois-infer`、`omomo-infer`。此候选镜像
   继承的是无权重环境版本，调用时须按上游配置明确提供 checkpoint 和数据路径。
@@ -92,7 +97,7 @@ LIGHT 与 InterAct 上游代码在解析参数前会加载 SMPL-H，因此在没
 docker run --rm --gpus all --network none \
   -v "$PWD/scripts/hoi/check_gpu.py:/tmp/check_gpu.py:ro" \
   --entrypoint /opt/conda/envs/light/bin/python \
-  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7 \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1 \
   /tmp/check_gpu.py light
 ```
 
