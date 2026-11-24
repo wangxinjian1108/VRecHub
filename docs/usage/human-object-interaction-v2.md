@@ -11,6 +11,12 @@ HOI、LIGHT、InterAct、HAIC 的基础 CUDA 检查通过；GRAIL 的 `nvdiffras
 已重编译并在 L4 上通过 CUDA 三角形光栅化检查。这些基础检查不等于真实数据
 上的推理或仿真通过。
 
+GRAIL 的多架构 CUDA 扩展和 HAIC 的 TorchRL ABI 修正分别由
+[GRAIL 扩展构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45479688381)
+和 [HAIC 扩展构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45483381424)
+生成，并通过 [组合任务](https://github.com/wangxinjian1108/VRecHub/actions/runs/45484363517)
+加入候选镜像。
+
 目前已在 GitHub Actions 中用相同的四个环境层验证 CHOIS、OMOMO、
 Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
 独立运行时的构建和 CPU 组件检查也已通过。前一项测试使用较小的验证
@@ -21,8 +27,12 @@ Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；
 详见 [检查记录](https://github.com/wangxinjian1108/VRecHub/actions/runs/45419274165)。
 
 ```text
-ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d
+ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:89aa3801e1bdcd7499a8a03a9863bc84474fcacd51929da4b17e54d8b1c870c1
 ```
+
+该机器已将相同镜像标记为本地标签
+`ghcr.io/wangxinjian1108/human-object-interaction-v2:local-verified`；这是本地
+标签，远端拉取请使用上述摘要。
 
 压缩镜像层约 59.8 GiB，解压和运行还需要额外空间。GRAIL 上游测试环境为
 48 GB 显存的 RTX 6000 Ada 和 595.99.02 驱动；上游记录的部分场景重建
@@ -36,12 +46,12 @@ SMPL-H／SMPL-X 人体模型。各模型还需要按上游说明准备对应 che
 ## 启动与环境
 
 ```bash
-docker pull ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d
+docker pull ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:89aa3801e1bdcd7499a8a03a9863bc84474fcacd51929da4b17e54d8b1c870c1
 
 docker run --rm -it --gpus all --shm-size=16g \
   -v /data/hoi-models:/models \
   -v /data/hoi-output:/outputs \
-  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:89aa3801e1bdcd7499a8a03a9863bc84474fcacd51929da4b17e54d8b1c870c1 \
   bash
 ```
 
@@ -76,9 +86,9 @@ GRAIL 的 GEM-X 环境位于 `/root/.cache/grail/envs/gem-x`，不要将宿主�
 - **HAIC**：从 `/app/HAIC` 使用 `haic` 环境运行上游 `scripts/play.py`，例如
   `python scripts/play.py algo=ppo_haic_train task=G1/haic/skateboard checkpoint_path=/models/haic/checkpoint.pt`；
   上游默认的 `G1/G1Track-walk` 配置不存在，应明确指定任务和算法。需提供与任务
-  匹配的策略 checkpoint、仿真数据和兼容 Isaac Sim 的 GPU／驱动。当前环境中的
-  TorchRL 0.7 C++ 扩展与 PyTorch 2.7 不兼容，导入会警告；部分功能（例如优先经验
-  回放）不可用，完整仿真尚未验证。
+  匹配的策略 checkpoint、仿真数据和兼容 Isaac Sim 的 GPU／驱动。TorchRL 0.7
+  扩展已针对 PyTorch 2.7 重编译，优先经验回放的写入和采样检查通过；完整仿真
+  尚未验证。
   参见 [HAIC 上游说明](https://github.com/ldt29/HAIC)。
 - **CHOIS 和 OMOMO**：入口分别为 `chois-infer`、`omomo-infer`。此候选镜像
   继承的是无权重环境版本，调用时须按上游配置明确提供 checkpoint 和数据路径。
@@ -97,7 +107,7 @@ LIGHT 与 InterAct 上游代码在解析参数前会加载 SMPL-H，因此在没
 docker run --rm --gpus all --network none \
   -v "$PWD/scripts/hoi/check_gpu.py:/tmp/check_gpu.py:ro" \
   --entrypoint /opt/conda/envs/light/bin/python \
-  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:89aa3801e1bdcd7499a8a03a9863bc84474fcacd51929da4b17e54d8b1c870c1 \
   /tmp/check_gpu.py light
 ```
 

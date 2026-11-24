@@ -14,6 +14,7 @@ conda run --no-capture-output -n interact python /tmp/check_entrypoint.py sample
 conda run --no-capture-output -n interact python /tmp/check_entrypoint.py sample.local_generate_obj_guide_contactv2
 
 conda run --no-capture-output -n haic python -c 'import torch,isaaclab,isaacsim,active_adaptation; assert torch.version.cuda == "12.8"; print("HAIC imports ready")'
+conda run --no-capture-output -n haic python -c 'import torch,torchrl._torchrl; from torchrl.data import PrioritizedReplayBuffer,LazyTensorStorage; b=PrioritizedReplayBuffer(alpha=0.7,beta=0.5,storage=LazyTensorStorage(8),batch_size=2); b.extend(torch.arange(4).unsqueeze(-1)); x=b.sample(); assert x.shape == (2,1) and ((x>=0)&(x<4)).all(); print("HAIC TorchRL prioritized replay ready")'
 cd /app/HAIC
 conda run --no-capture-output -n haic python scripts/play.py --help algo=ppo_haic_train task=G1/haic/skateboard
 

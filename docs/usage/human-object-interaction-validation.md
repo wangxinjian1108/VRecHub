@@ -75,7 +75,7 @@ docker run --rm --gpus all --network none --shm-size=4g \
 ## 在 V2 聚合镜像上复测
 
 2026-11-25，使用 V2 候选镜像摘要
-`sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d`
+`sha256:89aa3801e1bdcd7499a8a03a9863bc84474fcacd51929da4b17e54d8b1c870c1`
 重复了上述采样测试。CHOIS 的完整 1,000 步采样，以及 OMOMO 标准和
 object-split 权重的两阶段各 1,000 步采样均通过输出形状和有限值检查。
 权重从已有 V1 带权重镜像取出并只读挂载，V2 镜像本身不含这些权重；测试
