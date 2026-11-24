@@ -1,0 +1,13 @@
+**
+!thirdparty/
+!thirdparty/HAIC/
+!thirdparty/HAIC/**
+!docker/
+!docker/apps/
+!docker/apps/hoi-haic-runtime/
+!docker/apps/hoi-haic-runtime/**
+**/.git
+**/__pycache__
+**/*.pth
+**/*.ckpt
+**/*.safetensors
