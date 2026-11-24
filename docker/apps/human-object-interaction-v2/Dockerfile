@@ -3,7 +3,7 @@
 ARG GRAIL_IMAGE=ghcr.io/wangxinjian1108/hoi-grail-runtime:latest
 ARG HOI_IMAGE=ghcr.io/wangxinjian1108/human-object-interaction-v1@sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2
 ARG LIGHT_IMAGE=ghcr.io/wangxinjian1108/scene-edit-models-v5@sha256:60adbaf95bf7f7e725461b5d9b4365d2e56a5f28f24dde319fb4d8cad80e053a
-ARG INTERACT_IMAGE=ghcr.io/wangxinjian1108/hoi-interact-runtime@sha256:586c62661be70edde9761b2366c51787e9777b9f8e07d0d17b50a9b56e212767
+ARG INTERACT_IMAGE=ghcr.io/wangxinjian1108/hoi-interact-runtime-headless@sha256:3701a71e590502e55f58ab5ee5a2a006ab399ec9f33b8a887d534ec2e371659c
 ARG HAIC_IMAGE=ghcr.io/wangxinjian1108/hoi-haic-runtime@sha256:4740c6dd677ee900c1bba727a066c78a4b9ef349aba5d767291d7873b03d0f30
 FROM ${HOI_IMAGE} AS hoi
 FROM ${LIGHT_IMAGE} AS light
@@ -43,10 +43,15 @@ COPY --from=interact /app/InterAct /app/InterAct
 COPY --from=haic /opt/conda/envs/haic /opt/conda/envs/haic
 COPY --from=haic /opt/IsaacLab /opt/IsaacLab
 COPY --from=haic /app/HAIC /app/HAIC
+COPY scripts/hoi/check_entrypoint.py /tmp/check_entrypoint.py
 RUN conda run -n light python -c 'import torch, pytorch3d, clip, smplx; print("LIGHT ready", torch.__version__)' \
     && conda run -n interact python -c 'import torch, pytorch3d, pointnet2_ops._ext, spacy; from human_body_prior.tools import tgm_conversion; assert spacy.load("en_core_web_sm"); print("InterAct ready", torch.__version__)' \
     && conda run -n haic python -c 'import torch, isaaclab, isaacsim, active_adaptation; print("HAIC ready", torch.__version__)' \
-    && /root/miniconda3/bin/conda run -n grail python -c 'import grail; print("GRAIL source ready")'
+    && /root/miniconda3/bin/conda run -n grail python -c 'import grail; print("GRAIL source ready")' \
+    && cd /app/InterAct/text2interaction \
+    && PYGLET_HEADLESS=1 PYOPENGL_PLATFORM=egl conda run -n interact python /tmp/check_entrypoint.py sample.local_generate_obj \
+    && PYGLET_HEADLESS=1 PYOPENGL_PLATFORM=egl conda run -n interact python /tmp/check_entrypoint.py sample.local_generate_obj_guide_contactv2 \
+    && rm /tmp/check_entrypoint.py
 
 WORKDIR /workspace/grail
 CMD ["bash"]
