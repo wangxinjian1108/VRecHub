@@ -20,11 +20,15 @@ COPY docker/apps/hoi-haic-runtime/constraints.txt /tmp/haic-constraints.txt
 RUN pip install 'pip==25.3' 'setuptools==80.10.2' 'wheel==0.46.3' \
     && pip install 'isaacsim[all,extscache]==5.1.0' --extra-index-url https://pypi.nvidia.com \
     && git clone --depth 1 --branch v2.3.2 https://github.com/isaac-sim/IsaacLab.git /opt/IsaacLab \
+    # Isaac Lab's livestream pin conflicts with Isaac Sim 5.1's FastAPI pin.
+    # Keep Isaac Sim's supported Starlette; livestream is not validated here.
+    && grep -q '"starlette==0.49.1"' /opt/IsaacLab/source/isaaclab/setup.py \
+    && sed -i 's/"starlette==0.49.1"/"starlette==0.45.3"/' /opt/IsaacLab/source/isaaclab/setup.py \
     && pip install --no-build-isolation 'flatdict==4.0.1' \
     && /opt/IsaacLab/isaaclab.sh -i none \
     && pip install -c /tmp/haic-constraints.txt -e /app/HAIC \
     && pip install -r /tmp/haic-constraints.txt \
     && pip install torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu128 \
     && python -m pip check \
-    && python -c 'import importlib.util; assert importlib.util.find_spec("isaaclab") and importlib.util.find_spec("isaacsim") and importlib.util.find_spec("active_adaptation"); print("HAIC dependencies installed")'
+    && python -c 'import torch, isaaclab, isaacsim, active_adaptation; assert torch.version.cuda == "12.8"; print("HAIC imports ready", torch.__version__)'
 CMD ["bash"]
