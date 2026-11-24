@@ -18,8 +18,10 @@ RUN pip install 'pip<25' 'setuptools==69.5.1' wheel ninja \
  && pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118 \
  && pip install fvcore iopath 'numpy==1.23.1' \
  && pip install --no-build-isolation 'git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4' \
+ && conda clean -afy
  && pip install -c /tmp/constraints.txt -r requirements.txt \
- && pip install --no-deps --ignore-requires-python 'git+https://github.com/nghorbani/human_body_prior.git@6b883ecc3000697409a8caa2744523afe041e48a' \
+ && pip install --no-deps --ignore-requires-python 'git+https://github.com/nghorbani/human_body_prior.git@4c246d8a83ce16d3cff9c79dcf04d81fa440a6bc' \
+ && pip install 'loguru<0.8' 'omegaconf==2.3.0' \
  && python -m spacy download en_core_web_sm \
  && git clone https://github.com/erikwijmans/Pointnet2_PyTorch.git /tmp/pointnet2 \
  && git -C /tmp/pointnet2 checkout b5ceb6d9ca0467ea34beb81023f96ee82228f626 \
