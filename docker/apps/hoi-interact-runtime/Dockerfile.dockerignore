@@ -1,0 +1,14 @@
+**
+!thirdparty/
+!thirdparty/InterAct/
+!thirdparty/InterAct/**
+!docker/
+!docker/apps/
+!docker/apps/hoi-interact-runtime/
+!docker/apps/hoi-interact-runtime/**
+**/.git
+**/__pycache__
+**/*.pt
+**/*.pth
+**/*.ckpt
+**/*.safetensors

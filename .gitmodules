@@ -97,3 +97,9 @@
 [submodule "thirdparty/LIGHT"]
 	path = thirdparty/LIGHT
 	url = https://github.com/wzyabcas/LIGHT.git
+[submodule "thirdparty/InterAct"]
+	path = thirdparty/InterAct
+	url = https://github.com/wzyabcas/InterAct.git
+[submodule "thirdparty/HAIC"]
+	path = thirdparty/HAIC
+	url = https://github.com/ldt29/HAIC.git
