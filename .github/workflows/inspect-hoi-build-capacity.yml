@@ -1,0 +1,38 @@
+name: Inspect HOI build capacity
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Inspect runner disk before cleanup
+        run: df -h / /mnt
+      - name: Free optional hosted tools
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          sudo rm -rf /usr/share/swift /usr/local/graalvm /usr/local/.ghcup
+          sudo rm -rf /usr/local/share/powershell /usr/local/share/chromium
+          sudo docker image prune -af
+          df -h / /mnt
+      - uses: docker/setup-buildx-action@v3
+      - name: Inspect official GRAIL image manifest without pulling layers
+        run: |
+          docker buildx imagetools inspect \
+            nvgrail/grail@sha256:14eb489f0d6eb80b8ae198d44bfd4800695af27202a7a38b504c57d22f65ad8e \
+            --raw > /tmp/grail-manifest.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/grail-manifest.json') as f:
+              manifest = json.load(f)
+          layers = manifest.get('layers')
+          if layers is None:
+              print('Image index:', json.dumps(manifest.get('manifests', []), indent=2))
+          else:
+              sizes = [layer['size'] for layer in layers]
+              print(f'Layers: {len(sizes)}; compressed total: {sum(sizes) / 2**30:.2f} GiB')
+              print('Largest compressed layers in GiB:',
+                    [round(size / 2**30, 2) for size in sorted(sizes, reverse=True)[:10]])
+          PY
