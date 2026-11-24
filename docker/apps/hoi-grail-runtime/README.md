@@ -2,8 +2,10 @@
 
 This stage builds on NVIDIA's pinned GRAIL 1.2.0 image and uses the pinned
 GRAIL submodule. The workflow is manual because the upstream image is about
-89 GB unpacked: provide a GitHub Actions runner with at least 200 GB free.
-The standard hosted runner is not expected to have enough disk space.
+89 GB unpacked and its compressed layers occupy another 27.55 GiB. A hosted
+runner measured 123 GiB free after cleanup; whether that suffices for the
+additional workers is under test. A runner with at least 200 GB free is
+recommended.
 
 The build installs the source-bound reconstruction workers and Blender. It
 does not download model checkpoints or example datasets. The FlexGEMM GPU
