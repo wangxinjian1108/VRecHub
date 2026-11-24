@@ -11,7 +11,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglu1-mesa libegl1 libosmesa6 libsm6 libxext6 libxrender1 \
     libxi6 libxfixes3 libxrandr2 libxinerama1 libxcursor1 \
-    libxkbcommon0 libfontconfig1 libfreetype6 libopenmesh-dev \
+    libxkbcommon0 libfontconfig1 libfreetype6 \
     && rm -rf /var/lib/apt/lists/* \
     && conda create -n interpose python=3.8 -y \
     && conda create -n protomotions_interpose python=3.8 -y \
