@@ -6,10 +6,10 @@ HAIC、CHOIS、OMOMO、Kimodo 和 Blender。候选镜像的清单与各来源层
 
 下方候选镜像已移除继承的 `/workspace/grail` 匿名卷声明。本机完整镜像的
 CPU 环境和 Blender 渲染检查通过；本机 NVIDIA 驱动 550.144.03 不满足镜像
-的 `cuda>=12.8` 启动检查，GPU 运行需要兼容的驱动。临时绕过该门槛的
-基础 CUDA 检查中，HOI、LIGHT、InterAct 和 HAIC 通过；GRAIL 的
-`nvdiffrast` 仅含 `sm_120` 内核，在本机 L4（`sm_89`）上失败，修正层正在构建。
-这些基础检查不等于真实数据上的推理或仿真通过。
+的 `cuda>=12.8` 启动检查，GPU 运行需要兼容的驱动。临时绕过该门槛后，
+HOI、LIGHT、InterAct、HAIC 的基础 CUDA 检查通过；GRAIL 的 `nvdiffrast`
+已重编译并在 L4 上通过 CUDA 三角形光栅化检查。这些基础检查不等于真实数据
+上的推理或仿真通过。
 
 目前已在 GitHub Actions 中用相同的四个环境层验证 CHOIS、OMOMO、
 Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
@@ -21,7 +21,7 @@ Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；
 详见 [检查记录](https://github.com/wangxinjian1108/VRecHub/actions/runs/45419274165)。
 
 ```text
-ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1
+ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d
 ```
 
 压缩镜像层约 59.8 GiB，解压和运行还需要额外空间。GRAIL 上游测试环境为
@@ -36,12 +36,12 @@ SMPL-H／SMPL-X 人体模型。各模型还需要按上游说明准备对应 che
 ## 启动与环境
 
 ```bash
-docker pull ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1
+docker pull ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d
 
 docker run --rm -it --gpus all --shm-size=16g \
   -v /data/hoi-models:/models \
   -v /data/hoi-output:/outputs \
-  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1 \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d \
   bash
 ```
 
@@ -97,7 +97,7 @@ LIGHT 与 InterAct 上游代码在解析参数前会加载 SMPL-H，因此在没
 docker run --rm --gpus all --network none \
   -v "$PWD/scripts/hoi/check_gpu.py:/tmp/check_gpu.py:ro" \
   --entrypoint /opt/conda/envs/light/bin/python \
-  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:b3338360dc26b52b39b937c240a374b4578ee2cd7bb7a68c5c035832e4ab91f1 \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d \
   /tmp/check_gpu.py light
 ```
 
