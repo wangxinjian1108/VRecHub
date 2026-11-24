@@ -43,3 +43,27 @@ stage2 /models/omomo/stage2_object_split/model.pt
 ```
 
 各项均加 `--sample-steps 1000 --frames 120`。
+
+## OMOMO 两阶段衔接
+
+2026-11-25，在同一台 L4 和上述带权重镜像中，使用合成输入分别测试了标准
+权重和 object-split 权重的两阶段连续采样。第一阶段生成 `(1, 120, 6)`
+的双手位置后，按上游 `gen_fullbody_from_predicted_hand_foot` 的位置和
+掩码放入第二阶段条件；第二阶段生成 `(1, 120, 204)` 的全身运动。两个
+阶段均运行完整的 1,000 步采样，输出形状和有限值检查通过。
+
+该检查验证阶段之间的张量衔接和采样调用，并不验证真实物体数据、动作质量、
+人体网格或渲染。可从仓库根目录复现标准权重测试：
+
+```bash
+docker run --rm --gpus all --network none --shm-size=4g \
+  -v "$PWD/scripts/hoi/test_omomo_two_stage.py:/tmp/test_two_stage.py:ro" \
+  -w /app/omomo_release --entrypoint /opt/conda/envs/hoi/bin/python \
+  repo-volc.zelostech.com.cn/zcloud/human-object-interaction-v1:latest \
+  /tmp/test_two_stage.py /models/omomo/stage1/model.pt \
+  /models/omomo/stage2/model.pt --frames 120
+```
+
+测试 object-split 权重时，分别将两个权重路径替换为
+`/models/omomo/stage1_object_split/model.pt` 和
+`/models/omomo/stage2_object_split/model.pt`。
