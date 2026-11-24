@@ -9,7 +9,7 @@ HAIC、CHOIS、OMOMO、Kimodo 和 Blender。候选镜像的清单与各来源层
 Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
 独立运行时的构建和 CPU 组件检查也已通过。前一项测试使用较小的验证
 基础镜像，不包含 GRAIL，不能替代完整聚合镜像的运行验证。对应记录为
-[组合环境检查](https://github.com/wangxinjian1108/VRecHub/actions/runs/45428747111)
+[组合环境检查](https://github.com/wangxinjian1108/VRecHub/actions/runs/45445347199)
 和 [GRAIL 构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45395578227)。
 完整镜像的 GitHub 托管节点检查在拉取阶段耗尽磁盘空间，尚未执行容器测试；
 详见 [检查记录](https://github.com/wangxinjian1108/VRecHub/actions/runs/45419274165)。
