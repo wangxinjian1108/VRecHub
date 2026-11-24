@@ -13,7 +13,13 @@ import torch
 parser = argparse.ArgumentParser()
 parser.add_argument('model', choices=['chois', 'stage1', 'stage2'])
 parser.add_argument('checkpoint')
+parser.add_argument('--sample-steps', type=int, default=0,
+                    help='Also exercise the sampler on synthetic inputs (1000 = full schedule)')
+parser.add_argument('--frames', type=int, default=8,
+                    help='Synthetic sequence length, up to the 120-frame model window')
 args = parser.parse_args()
+if not 1 <= args.frames <= 120:
+    parser.error('--frames must be between 1 and 120')
 if args.model == 'chois':
     from manip.model.transformer_object_motion_cond_diffusion import ObjectCondGaussianDiffusion as Model
     dim, cond_dim = 220, 220 + 256
@@ -42,10 +48,36 @@ assert torch.cuda.is_available()
 torch.manual_seed(17)
 model = model.cuda().eval()
 with torch.inference_mode():
-    x = torch.randn(1, 8, dim, device='cuda')
-    condition = torch.randn(1, 8, cond_dim, device='cuda')
+    x = torch.randn(1, args.frames, dim, device='cuda')
+    condition = torch.randn(1, args.frames, cond_dim, device='cuda')
     t = torch.tensor([500], device='cuda')
     y = model.denoise_fn(x, t, condition)
     torch.cuda.synchronize()
 assert y.shape == x.shape and torch.isfinite(y).all()
 print(f'{args.model} EMA denoiser: {tuple(y.shape)}, finite=True, GPU={torch.cuda.get_device_name(0)}')
+
+if args.sample_steps:
+    if not 1 <= args.sample_steps <= model.num_timesteps:
+        raise ValueError('sample steps must be within the checkpoint diffusion schedule')
+    # Limiting the checkpoint's 1,000-step loop tests the sampling code, but
+    # does not produce a sample from the original diffusion schedule.
+    full_schedule = args.sample_steps == model.num_timesteps
+    model.num_timesteps = args.sample_steps
+    with torch.inference_mode():
+        if args.model == 'chois':
+            import clip
+            clip_model, _ = clip.load('/models/clip/ViT-B-32.pt', device='cuda', jit=False)
+            tokens = clip.tokenize(['a person carries a box']).cuda()
+            language = clip_model.encode_text(tokens).float()
+            model.seq_len = x.shape[1]
+            result = model.sample(x, torch.randn(1, 1, 3072, device='cuda'),
+                                  cond_mask=torch.ones_like(x), language_input=language)
+        elif args.model == 'stage1':
+            geometry = torch.randn(1, x.shape[1], 3 + 3072, device='cuda')
+            result = model.sample(x, geometry)
+        else:
+            result = model.sample(x, cond_mask=torch.ones_like(x))
+        torch.cuda.synchronize()
+    assert result.shape == x.shape and torch.isfinite(result).all()
+    schedule = 'full' if full_schedule else 'shortened'
+    print(f'{args.model} {schedule} sampler: {args.sample_steps} steps, {tuple(result.shape)}, finite=True')
