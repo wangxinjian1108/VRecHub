@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1
-# The LIGHT source will be pinned after its corrected stage passes CI.
 ARG GRAIL_IMAGE=ghcr.io/wangxinjian1108/hoi-grail-runtime@sha256:9dd75d6f547804aee60127b71c8a9c578ef3878d9aae4be7f3adcce6e9e8b3a1
 ARG HOI_IMAGE=ghcr.io/wangxinjian1108/human-object-interaction-v1@sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2
-ARG LIGHT_IMAGE=ghcr.io/wangxinjian1108/scene-edit-models-v5@sha256:60adbaf95bf7f7e725461b5d9b4365d2e56a5f28f24dde319fb4d8cad80e053a
+ARG LIGHT_IMAGE=ghcr.io/wangxinjian1108/hoi-light-runtime@sha256:3d550212893003f895f4ea7a92e7a2cae7a5895a82f5879f21ea1c3fc47f015a
 ARG INTERACT_IMAGE=ghcr.io/wangxinjian1108/hoi-interact-runtime-headless@sha256:3701a71e590502e55f58ab5ee5a2a006ab399ec9f33b8a887d534ec2e371659c
 ARG HAIC_IMAGE=ghcr.io/wangxinjian1108/hoi-haic-runtime@sha256:4740c6dd677ee900c1bba727a066c78a4b9ef349aba5d767291d7873b03d0f30
 FROM ${HOI_IMAGE} AS hoi
@@ -45,10 +44,12 @@ COPY --from=haic /opt/conda/envs/haic /opt/conda/envs/haic
 COPY --from=haic /opt/IsaacLab /opt/IsaacLab
 COPY --from=haic /app/HAIC /app/HAIC
 COPY scripts/hoi/check_entrypoint.py /tmp/check_entrypoint.py
-RUN conda run -n light python -c 'import torch, pytorch3d, clip, smplx; print("LIGHT ready", torch.__version__)' \
+RUN conda run -n light python -c 'import torch, pytorch3d, clip, smplx, spacy; from transformers.utils import is_torch_available; assert is_torch_available(); spacy.load("en_core_web_sm"); print("LIGHT ready", torch.__version__)' \
     && conda run -n interact python -c 'import torch, pytorch3d, pointnet2_ops._ext, spacy; from human_body_prior.tools import tgm_conversion; assert spacy.load("en_core_web_sm"); print("InterAct ready", torch.__version__)' \
     && conda run -n haic python -c 'import torch, isaaclab, isaacsim, active_adaptation; print("HAIC ready", torch.__version__)' \
     && /root/miniconda3/bin/conda run -n grail python -c 'import grail; print("GRAIL source ready")' \
+    && cd /app/LIGHT \
+    && conda run -n light python /tmp/check_entrypoint.py sample.generate \
     && cd /app/InterAct/text2interaction \
     && PYGLET_HEADLESS=1 PYOPENGL_PLATFORM=egl conda run -n interact python /tmp/check_entrypoint.py sample.local_generate_obj \
     && PYGLET_HEADLESS=1 PYOPENGL_PLATFORM=egl conda run -n interact python /tmp/check_entrypoint.py sample.local_generate_obj_guide_contactv2 \
