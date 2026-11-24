@@ -5,6 +5,11 @@ HAIC、CHOIS、OMOMO、Kimodo 和 Blender。候选镜像的清单与各来源层
 完整容器验证结果应以 Actions 的检查任务为准，不应把候选版本视为已验证的
 正式发布。
 
+本机检查发现下方旧候选镜像继承了 `/workspace/grail` 匿名卷声明，创建容器时
+Docker 会复制该目录并额外占用大量空间；修正后的候选镜像尚在构建。另外，
+本机 NVIDIA 驱动 550.144.03 不满足该镜像的 `cuda>=12.8` 启动检查，GPU
+运行需要兼容的驱动；不要将 CPU 检查通过视为 GPU 推理通过。
+
 目前已在 GitHub Actions 中用相同的四个环境层验证 CHOIS、OMOMO、
 Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
 独立运行时的构建和 CPU 组件检查也已通过。前一项测试使用较小的验证

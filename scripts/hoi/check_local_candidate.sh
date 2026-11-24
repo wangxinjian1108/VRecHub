@@ -12,7 +12,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 docker image inspect "$image" >/dev/null || exit 1
 
 result=0
-if ! docker run --rm --network none \
+if ! docker run --rm --runtime runc --network none \
     -v "$repo_root/scripts/hoi/check_entrypoint.py:/tmp/check_entrypoint.py:ro" \
     -v "$repo_root/scripts/hoi/check_aggregate.sh:/tmp/check_aggregate.sh:ro" \
     -e HOI_CHECK_SCOPE=complete \
@@ -22,12 +22,18 @@ if ! docker run --rm --network none \
 fi
 
 echo 'Checking Blender headless rendering'
-if ! docker run --rm --network none \
+if ! docker run --rm --runtime runc --network none \
     -v "$repo_root/scripts/hoi/check_blender.py:/tmp/check_blender.py:ro" \
     --entrypoint /opt/blender/blender "$image" \
     --background -noaudio --python-exit-code 1 --python /tmp/check_blender.py; then
     echo 'Blender headless render failed.' >&2
     result=1
+fi
+
+gpu_runtime_args=()
+if [[ "${HOI_DISABLE_CUDA_REQUIRE:-0}" == 1 ]]; then
+    gpu_runtime_args=(-e NVIDIA_DISABLE_REQUIRE=1)
+    echo 'Testing with the NVIDIA image driver requirement disabled.'
 fi
 
 for env_name in hoi light interact haic grail; do
@@ -37,7 +43,7 @@ for env_name in hoi light interact haic grail; do
         python_bin="/opt/conda/envs/$env_name/bin/python"
     fi
     echo "Checking GPU environment: $env_name"
-    if ! docker run --rm --gpus all --network none \
+    if ! docker run --rm --gpus all --network none "${gpu_runtime_args[@]}" \
         -v "$repo_root/scripts/hoi/check_gpu.py:/tmp/check_gpu.py:ro" \
         --entrypoint "$python_bin" "$image" /tmp/check_gpu.py "$env_name"; then
         echo "GPU check failed: $env_name" >&2

@@ -14,9 +14,9 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
-// compose retains the base runtime configuration and appends component
-// filesystem layers in order. Component images must contain only the intended
-// absolute paths; they are exported separately from the verified runtimes.
+// compose appends component layers and retains the base runtime configuration,
+// except for the inherited GRAIL workspace volume. Docker otherwise copies the
+// entire bundled workspace into a new anonymous volume at container creation.
 func compose(base v1.Image, components []v1.Image) (v1.Image, error) {
 	result := base
 	for index, component := range components {
@@ -28,6 +28,15 @@ func compose(base v1.Image, components []v1.Image) (v1.Image, error) {
 		if err != nil {
 			return nil, fmt.Errorf("append component %d: %w", index, err)
 		}
+	}
+	config, err := result.ConfigFile()
+	if err != nil {
+		return nil, fmt.Errorf("read composed configuration: %w", err)
+	}
+	delete(config.Config.Volumes, "/workspace/grail")
+	result, err = mutate.Config(result, config.Config)
+	if err != nil {
+		return nil, fmt.Errorf("remove inherited workspace volume: %w", err)
 	}
 	return result, nil
 }

@@ -39,6 +39,7 @@ func testImage(t *testing.T, path, contents string) v1.Image {
 func TestComposePreservesBaseConfigAndAllFiles(t *testing.T) {
 	base, err := mutate.Config(testImage(t, "workspace/grail/base", "base"), v1.Config{
 		Env: []string{"BASE_ENV=present"}, WorkingDir: "/workspace/grail", Cmd: []string{"bash"},
+		Volumes: map[string]struct{}{"/workspace/grail": {}, "/other": {}},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -59,6 +60,12 @@ func TestComposePreservesBaseConfigAndAllFiles(t *testing.T) {
 	}
 	if len(config.RootFS.DiffIDs) != 3 {
 		t.Fatalf("expected three filesystem layers, got %d", len(config.RootFS.DiffIDs))
+	}
+	if _, ok := config.Config.Volumes["/workspace/grail"]; ok {
+		t.Fatal("inherited GRAIL workspace must not be an anonymous volume")
+	}
+	if _, ok := config.Config.Volumes["/other"]; !ok {
+		t.Fatal("unrelated base volumes must be preserved")
 	}
 	reader := mutate.Extract(result)
 	defer reader.Close()
