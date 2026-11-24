@@ -14,6 +14,7 @@ FROM ${GRAIL_IMAGE} AS aggregate
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive CONDA_DIR=/opt/conda \
     PATH=/opt/conda/bin:${PATH} MPLBACKEND=Agg WANDB_MODE=disabled \
+    PYOPENGL_PLATFORM=egl PYGLET_HEADLESS=1 \
     SMPLH_PATH=/models/smplh_amass BLENDER_PATH=/usr/local/bin/blender \
     HF_HOME=/models/huggingface
 RUN apt-get update && apt-get install -y --no-install-recommends \
