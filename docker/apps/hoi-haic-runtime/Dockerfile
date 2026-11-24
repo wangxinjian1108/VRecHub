@@ -16,13 +16,14 @@ RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-la
 ENV PATH=/opt/conda/envs/haic/bin:/opt/conda/bin:$PATH
 WORKDIR /app/HAIC
 COPY thirdparty/HAIC/ /app/HAIC/
+COPY docker/apps/hoi-haic-runtime/constraints.txt /tmp/haic-constraints.txt
 RUN pip install 'pip==25.3' 'setuptools==80.10.2' 'wheel==0.46.3' \
     && pip install 'isaacsim[all,extscache]==5.1.0' --extra-index-url https://pypi.nvidia.com \
     && git clone --depth 1 --branch v2.3.2 https://github.com/isaac-sim/IsaacLab.git /opt/IsaacLab \
     && pip install --no-build-isolation 'flatdict==4.0.1' \
     && /opt/IsaacLab/isaaclab.sh -i none \
-    && pip install -e /app/HAIC \
-    && pip install 'numpy==1.26.0' 'click==8.1.7' 'psutil==5.9.8' 'typing_extensions==4.12.2' 'websockets==12.0' 'wheel==0.45.1' \
+    && pip install -c /tmp/haic-constraints.txt -e /app/HAIC \
+    && pip install -r /tmp/haic-constraints.txt \
     && pip install torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu128 \
     && python -m pip check \
     && python -c 'import importlib.util; assert importlib.util.find_spec("isaaclab") and importlib.util.find_spec("isaacsim") and importlib.util.find_spec("active_adaptation"); print("HAIC dependencies installed")'

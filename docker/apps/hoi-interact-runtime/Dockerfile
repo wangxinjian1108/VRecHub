@@ -19,7 +19,7 @@ RUN pip install 'pip<25' 'setuptools==69.5.1' wheel ninja \
  && pip install fvcore iopath 'numpy==1.23.1' \
  && pip install --no-build-isolation 'git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4' \
  && conda clean -afy
- && pip install -c /tmp/constraints.txt -r requirements.txt \
+RUN pip install -c /tmp/constraints.txt -r requirements.txt \
  && pip install --no-deps --ignore-requires-python 'git+https://github.com/nghorbani/human_body_prior.git@4c246d8a83ce16d3cff9c79dcf04d81fa440a6bc' \
  && pip install 'loguru<0.8' 'omegaconf==2.3.0' \
  && python -m spacy download en_core_web_sm \
