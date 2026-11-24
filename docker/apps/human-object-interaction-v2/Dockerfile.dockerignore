@@ -1,0 +1,5 @@
+**
+!docker/
+!docker/apps/
+!docker/apps/human-object-interaction-v2/
+!docker/apps/human-object-interaction-v2/**
