@@ -23,7 +23,7 @@ COPY docker/apps/scene-edit-models-v5/constraints-light.txt /tmp/constraints-lig
 # PyTorch3D build; the conda environment provides a matching CUDA 12.4 compiler.
 RUN conda run -n light pip install 'pip<25' 'setuptools==69.5.1' wheel ninja \
     && conda run -n light pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124 \
-    && conda install -n light -c nvidia cuda-nvcc=12.4 cuda-cudart-dev=12.4 cuda-cccl=12.4 -y \
+    && conda install -n light -c nvidia cuda-nvcc=12.4 cuda-cudart-dev=12.4 cuda-cccl=12.4 cuda-libraries-dev=12.4 -y \
     && conda run -n light pip install fvcore iopath \
     && CUDA_HOME=/opt/conda/envs/light conda run -n light pip install --no-build-isolation 'git+https://github.com/facebookresearch/pytorch3d.git@v0.7.9' \
     && conda run -n light pip install -c /tmp/constraints-light.txt -r /app/LIGHT/requirements.txt \
