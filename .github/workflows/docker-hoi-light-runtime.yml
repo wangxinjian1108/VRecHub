@@ -4,6 +4,7 @@ on:
     branches: [master]
     paths:
       - 'docker/apps/hoi-light-runtime/**'
+      - 'scripts/hoi/check_entrypoint.py'
       - '.github/workflows/docker-hoi-light-runtime.yml'
   workflow_dispatch:
 jobs:

@@ -4,6 +4,7 @@ on:
     branches: [master]
     paths:
       - 'docker/apps/hoi-interact-runtime/Dockerfile.headless*'
+      - 'scripts/hoi/check_entrypoint.py'
       - '.github/workflows/docker-hoi-interact-headless.yml'
   workflow_dispatch:
 jobs:
