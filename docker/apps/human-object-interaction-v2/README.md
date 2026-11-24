@@ -4,10 +4,10 @@ This is an unvalidated build definition. It combines the environments for
 CHOIS, OMOMO, Kimodo, LIGHT, InterAct, HAIC and GRAIL, plus Blender. The
 independent environments remain at their original absolute Conda paths.
 
-The headless InterAct and HAIC stages passed their Actions builds and are
-pinned by digest. The InterAct entry-point checks mock creation of restricted
-SMPL-H assets; actual inference still requires those assets. Build only after
-the GRAIL stage has passed its Actions build and its
+The GRAIL, headless InterAct and HAIC stages passed their Actions builds and
+are pinned by digest. The InterAct entry-point checks mock creation of
+restricted SMPL-H assets; actual inference still requires those assets. Build
+only after the corrected LIGHT stage has passed its Actions build and its
 immutable image digest has been pinned in the Dockerfile. The manual
 workflow requires a large runner and publishes only a candidate tag. GRAIL's
 official base is about 89 GB unpacked, before the other environments and

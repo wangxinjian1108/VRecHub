@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-# Pin GRAIL to its immutable digest after its stage passes CI.
-ARG GRAIL_IMAGE=ghcr.io/wangxinjian1108/hoi-grail-runtime:latest
+# The LIGHT source will be pinned after its corrected stage passes CI.
+ARG GRAIL_IMAGE=ghcr.io/wangxinjian1108/hoi-grail-runtime@sha256:9dd75d6f547804aee60127b71c8a9c578ef3878d9aae4be7f3adcce6e9e8b3a1
 ARG HOI_IMAGE=ghcr.io/wangxinjian1108/human-object-interaction-v1@sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2
 ARG LIGHT_IMAGE=ghcr.io/wangxinjian1108/scene-edit-models-v5@sha256:60adbaf95bf7f7e725461b5d9b4365d2e56a5f28f24dde319fb4d8cad80e053a
 ARG INTERACT_IMAGE=ghcr.io/wangxinjian1108/hoi-interact-runtime-headless@sha256:3701a71e590502e55f58ab5ee5a2a006ab399ec9f33b8a887d534ec2e371659c
