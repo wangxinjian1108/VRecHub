@@ -1,7 +1,5 @@
 **
 !thirdparty/
-!thirdparty/InterPose/
-!thirdparty/InterPose/**
 !thirdparty/LIGHT/
 !thirdparty/LIGHT/**
 !docker/

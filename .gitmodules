@@ -94,9 +94,6 @@
 [submodule "thirdparty/Pi4"]
 	path = thirdparty/Pi4
 	url = https://github.com/wangxinjian1108/Pi4.git
-[submodule "thirdparty/InterPose"]
-	path = thirdparty/InterPose
-	url = https://github.com/Mael-zys/InterPose.git
 [submodule "thirdparty/LIGHT"]
 	path = thirdparty/LIGHT
 	url = https://github.com/wzyabcas/LIGHT.git
