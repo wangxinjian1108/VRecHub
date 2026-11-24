@@ -1,4 +1,4 @@
-name: Apply GRAIL CUDA component to HOI candidate
+name: Apply runtime component to HOI candidate
 on:
   workflow_dispatch:
     inputs:
@@ -7,7 +7,7 @@ on:
         type: string
         required: true
       component:
-        description: 'GRAIL CUDA component pinned by sha256 digest'
+        description: 'Runtime component pinned by sha256 digest'
         type: string
         required: true
 permissions:
