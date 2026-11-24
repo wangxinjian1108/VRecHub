@@ -33,7 +33,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
         run: |
           docker run --rm --network none -w /app/LIGHT --entrypoint /bin/bash "$IMAGE" -c \
-            '/opt/conda/envs/light/bin/python -m sample.generate --help'
+            '/opt/conda/envs/light/bin/python -m sample.generate --help && /opt/conda/envs/light/bin/python -c "import spacy; spacy.load(\"en_core_web_sm\")"'
       - name: Check InterAct inference entry points
         if: matrix.model == 'interact'
         env:
