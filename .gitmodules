@@ -103,3 +103,6 @@
 [submodule "thirdparty/HAIC"]
 	path = thirdparty/HAIC
 	url = https://github.com/ldt29/HAIC.git
+[submodule "thirdparty/GRAIL"]
+	path = thirdparty/GRAIL
+	url = https://github.com/NVlabs/GRAIL.git
