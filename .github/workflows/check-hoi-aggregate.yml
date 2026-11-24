@@ -37,7 +37,15 @@ jobs:
           IMAGE: ${{ inputs.image }}
         run: |
           [[ "$IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
-          docker pull "$IMAGE"
+          for attempt in 1 2 3; do
+            if docker pull "$IMAGE"; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              exit 1
+            fi
+            sleep 15
+          done
           docker image inspect "$IMAGE" --format 'Image size: {{.Size}} bytes'
           df -h
       - name: Check model environments and inference entry points
