@@ -5,7 +5,7 @@ on:
       mode:
         description: 'Run composition tests or publish a candidate'
         type: choice
-        options: [verify, compose]
+        options: [verify, compose, components-check]
         required: true
         default: verify
       base:
@@ -44,19 +44,28 @@ jobs:
       - name: Check layer order and base image configuration
         run: go test ./...
       - name: Login to GHCR
-        if: inputs.mode == 'compose'
+        if: inputs.mode == 'compose' || inputs.mode == 'components-check'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Compose and publish candidate image
-        if: inputs.mode == 'compose'
+        if: inputs.mode == 'compose' || inputs.mode == 'components-check'
         env:
           BASE_IMAGE: ${{ inputs.base }}
           HOI_IMAGE: ${{ inputs.hoi }}
           LIGHT_IMAGE: ${{ inputs.light }}
           INTERACT_IMAGE: ${{ inputs.interact }}
           HAIC_IMAGE: ${{ inputs.haic }}
-          DESTINATION: ghcr.io/${{ github.repository_owner }}/human-object-interaction-v2:candidate-${{ github.sha }}-${{ github.run_id }}
-        run: go run . "$BASE_IMAGE" "$HOI_IMAGE" "$LIGHT_IMAGE" "$INTERACT_IMAGE" "$HAIC_IMAGE" "$DESTINATION"
+          MODE: ${{ inputs.mode }}
+          OWNER: ${{ github.repository_owner }}
+          REVISION: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          if [ "$MODE" = components-check ]; then
+            destination="ghcr.io/$OWNER/hoi-components-verification:candidate-$REVISION-$RUN_ID"
+          else
+            destination="ghcr.io/$OWNER/human-object-interaction-v2:candidate-$REVISION-$RUN_ID"
+          fi
+          go run . "$BASE_IMAGE" "$HOI_IMAGE" "$LIGHT_IMAGE" "$INTERACT_IMAGE" "$HAIC_IMAGE" "$destination"
