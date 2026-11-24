@@ -58,5 +58,5 @@ jobs:
           LIGHT_IMAGE: ${{ inputs.light }}
           INTERACT_IMAGE: ${{ inputs.interact }}
           HAIC_IMAGE: ${{ inputs.haic }}
-          DESTINATION: ghcr.io/${{ github.repository_owner }}/human-object-interaction-v2:candidate-${{ github.sha }}
+          DESTINATION: ghcr.io/${{ github.repository_owner }}/human-object-interaction-v2:candidate-${{ github.sha }}-${{ github.run_id }}
         run: go run . "$BASE_IMAGE" "$HOI_IMAGE" "$LIGHT_IMAGE" "$INTERACT_IMAGE" "$HAIC_IMAGE" "$DESTINATION"
