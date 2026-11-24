@@ -5,6 +5,13 @@ HAIC、CHOIS、OMOMO、Kimodo 和 Blender。候选镜像的清单与各来源层
 完整容器验证结果应以 Actions 的检查任务为准，不应把候选版本视为已验证的
 正式发布。
 
+目前已在 GitHub Actions 中用相同的四个环境层验证 CHOIS、OMOMO、
+Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
+独立运行时的构建和 CPU 组件检查也已通过。前一项测试使用较小的验证
+基础镜像，不包含 GRAIL，不能替代完整聚合镜像的运行验证。对应记录为
+[组合环境检查](https://github.com/wangxinjian1108/VRecHub/actions/runs/45428747111)
+和 [GRAIL 构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45395578227)。
+
 ```text
 ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7
 ```
