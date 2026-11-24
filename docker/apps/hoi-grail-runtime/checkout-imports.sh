@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export GIT_LFS_SKIP_SMUDGE=1
+git config --global url."https://github.com/".insteadOf git@github.com:
 
 checkout() {
     local path="$1" url="$2" revision="$3"
@@ -10,6 +11,7 @@ checkout() {
     git -C "$path" -c protocol.version=2 fetch --depth 1 origin "$revision"
     git -C "$path" checkout -q --detach FETCH_HEAD
     test "$(git -C "$path" rev-parse HEAD)" = "$revision"
+    git -C "$path" submodule update --init --recursive --depth 1
 }
 
 # These are the gitlinks in GRAIL revision 548bbf1219f5ae6d54fe088db841b244ca34e81c.
