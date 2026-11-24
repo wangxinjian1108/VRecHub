@@ -1,0 +1,10 @@
+**
+!thirdparty/
+!thirdparty/GRAIL/
+!thirdparty/GRAIL/**
+!docker/
+!docker/apps/
+!docker/apps/hoi-grail-runtime/
+!docker/apps/hoi-grail-runtime/**
+**/.git
+**/__pycache__

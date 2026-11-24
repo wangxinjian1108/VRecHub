@@ -1,0 +1,42 @@
+name: Docker – HOI GRAIL runtime
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Runner label with at least 200 GB available for the build'
+        required: true
+        type: string
+jobs:
+  build:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 360
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: Checkout GRAIL and required simulator meshes
+        env:
+          GIT_LFS_SKIP_SMUDGE: '1'
+        run: |
+          git submodule update --init --depth 1 thirdparty/GRAIL
+          test "$(git -C thirdparty/GRAIL rev-parse HEAD)" = 548bbf1219f5ae6d54fe088db841b244ca34e81c
+          git -C thirdparty/GRAIL lfs pull --include='assets/robots/unitree_g1/meshes/**'
+          df -h
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/apps/hoi-grail-runtime/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/hoi-grail-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/hoi-grail-runtime:sha-${{ github.sha }}
