@@ -11,6 +11,8 @@ Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；
 基础镜像，不包含 GRAIL，不能替代完整聚合镜像的运行验证。对应记录为
 [组合环境检查](https://github.com/wangxinjian1108/VRecHub/actions/runs/45428747111)
 和 [GRAIL 构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45395578227)。
+完整镜像的 GitHub 托管节点检查在拉取阶段耗尽磁盘空间，尚未执行容器测试；
+详见 [检查记录](https://github.com/wangxinjian1108/VRecHub/actions/runs/45419274165)。
 
 ```text
 ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7
