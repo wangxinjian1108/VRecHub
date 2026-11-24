@@ -1,10 +1,10 @@
-# Human Object Interaction V2 候选镜像
+# Human Object Interaction V2
 
-该候选镜像通过 GitHub Actions 构建和组合，包含 LIGHT、InterAct、GRAIL、
-HAIC、CHOIS、OMOMO、Kimodo 和 Blender。候选镜像的清单与各来源层已核对；
-验证范围和已知问题如下，候选版本尚未作为正式版本发布。
+该镜像通过 GitHub Actions 构建和组合，包含 LIGHT、InterAct、GRAIL、
+HAIC、CHOIS、OMOMO、Kimodo 和 Blender。镜像的清单与各来源层已核对；
+具体验证范围和已知问题如下。
 
-下方候选镜像已移除继承的 `/workspace/grail` 匿名卷声明。本机完整镜像的
+下方镜像已移除继承的 `/workspace/grail` 匿名卷声明。本机完整镜像的
 CPU 环境和 Blender 渲染检查通过；本机 NVIDIA 驱动 550.144.03 不满足镜像
 的 `cuda>=12.8` 启动检查，GPU 运行需要兼容的驱动。临时绕过该门槛后，
 HOI、LIGHT、InterAct、HAIC 的基础 CUDA 检查通过；GRAIL 的 `nvdiffrast`
@@ -15,7 +15,8 @@ GRAIL 的多架构 CUDA 扩展和 HAIC 的 TorchRL ABI 修正分别由
 [GRAIL 扩展构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45479688381)
 和 [HAIC 扩展构建](https://github.com/wangxinjian1108/VRecHub/actions/runs/45483381424)
 生成，并通过 [组合任务](https://github.com/wangxinjian1108/VRecHub/actions/runs/45484363517)
-加入候选镜像。
+加入镜像，[标签任务](https://github.com/wangxinjian1108/VRecHub/actions/runs/45487602180)
+将验证过的同一摘要标记为 `latest`。
 
 目前已在 GitHub Actions 中用相同的四个环境层验证 CHOIS、OMOMO、
 Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；GRAIL
@@ -27,12 +28,13 @@ Kimodo、LIGHT、InterAct 和 HAIC 在同一测试容器内的导入与入口；
 详见 [检查记录](https://github.com/wangxinjian1108/VRecHub/actions/runs/45419274165)。
 
 ```text
+ghcr.io/wangxinjian1108/human-object-interaction-v2:latest
 ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:89aa3801e1bdcd7499a8a03a9863bc84474fcacd51929da4b17e54d8b1c870c1
 ```
 
 该机器已将相同镜像标记为本地标签
 `ghcr.io/wangxinjian1108/human-object-interaction-v2:local-verified`；这是本地
-标签，远端拉取请使用上述摘要。
+标签。远端可拉取 `latest`，需要固定版本时使用上述摘要。
 
 压缩镜像层约 59.8 GiB，解压和运行还需要额外空间。GRAIL 上游测试环境为
 48 GB 显存的 RTX 6000 Ada 和 595.99.02 驱动；上游记录的部分场景重建
@@ -90,7 +92,7 @@ GRAIL 的 GEM-X 环境位于 `/root/.cache/grail/envs/gem-x`，不要将宿主�
   扩展已针对 PyTorch 2.7 重编译，优先经验回放的写入和采样检查通过；完整仿真
   尚未验证。
   参见 [HAIC 上游说明](https://github.com/ldt29/HAIC)。
-- **CHOIS 和 OMOMO**：入口分别为 `chois-infer`、`omomo-infer`。此候选镜像
+- **CHOIS 和 OMOMO**：入口分别为 `chois-infer`、`omomo-infer`。此镜像
   继承的是无权重环境版本，调用时须按上游配置明确提供 checkpoint 和数据路径。
   两者的权重采样复测及其局限见
   [验证记录](human-object-interaction-validation.md)。
