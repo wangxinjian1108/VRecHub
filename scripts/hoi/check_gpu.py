@@ -38,8 +38,13 @@ def main():
     if args.environment == 'grail':
         import nvdiffrast.torch as dr
 
-        dr.RasterizeCudaContext()
-        print('GRAIL nvdiffrast CUDA context created')
+        ctx = dr.RasterizeCudaContext()
+        vertices = torch.tensor([[[-0.8, -0.8, 0., 1.], [0.8, -0.8, 0., 1.],
+                                  [0., 0.8, 0., 1.]]], device='cuda')
+        triangles = torch.tensor([[0, 1, 2]], dtype=torch.int32, device='cuda')
+        image, _ = dr.rasterize(ctx, vertices, triangles, resolution=[32, 32])
+        assert image.shape == (1, 32, 32, 4) and bool((image[..., 3] > 0).any())
+        print('GRAIL nvdiffrast CUDA triangle rasterization passed')
 
     torch.cuda.synchronize()
     print(f'{args.environment}: GPU={torch.cuda.get_device_name(0)}, '
