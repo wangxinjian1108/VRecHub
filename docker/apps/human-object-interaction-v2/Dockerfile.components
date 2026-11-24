@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1
+# Each target exports only the paths used by the aggregate. These scratch
+# images are layer sources, not standalone runnable images.
+FROM ghcr.io/wangxinjian1108/human-object-interaction-v1@sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2 AS hoi-source
+FROM ghcr.io/wangxinjian1108/hoi-light-runtime@sha256:3d550212893003f895f4ea7a92e7a2cae7a5895a82f5879f21ea1c3fc47f015a AS light-source
+FROM ghcr.io/wangxinjian1108/hoi-interact-runtime-headless@sha256:3701a71e590502e55f58ab5ee5a2a006ab399ec9f33b8a887d534ec2e371659c AS interact-source
+FROM ghcr.io/wangxinjian1108/hoi-haic-runtime@sha256:4740c6dd677ee900c1bba727a066c78a4b9ef349aba5d767291d7873b03d0f30 AS haic-source
+
+FROM scratch AS hoi
+COPY --from=hoi-source /opt/conda /opt/conda
+COPY --from=hoi-source /opt/blender /opt/blender
+COPY --from=hoi-source /app/chois_release /app/chois_release
+COPY --from=hoi-source /app/omomo_release /app/omomo_release
+COPY --from=hoi-source /app/kimodo /app/kimodo
+COPY --from=hoi-source /usr/local/bin/chois-infer /usr/local/bin/chois-infer
+COPY --from=hoi-source /usr/local/bin/omomo-infer /usr/local/bin/omomo-infer
+COPY --from=hoi-source /usr/local/bin/kimodo-gen /usr/local/bin/kimodo-gen
+COPY --from=hoi-source /usr/local/bin/human-object-interaction-smoke-test /usr/local/bin/human-object-interaction-smoke-test
+
+FROM scratch AS light
+COPY --from=light-source /opt/conda/envs/light /opt/conda/envs/light
+COPY --from=light-source /app/LIGHT /app/LIGHT
+
+FROM scratch AS interact
+COPY --from=interact-source /opt/conda/envs/interact /opt/conda/envs/interact
+COPY --from=interact-source /app/InterAct /app/InterAct
+
+FROM scratch AS haic
+COPY --from=haic-source /opt/conda/envs/haic /opt/conda/envs/haic
+COPY --from=haic-source /opt/IsaacLab /opt/IsaacLab
+COPY --from=haic-source /app/HAIC /app/HAIC
