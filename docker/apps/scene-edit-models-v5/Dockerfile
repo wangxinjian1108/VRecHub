@@ -11,7 +11,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglu1-mesa libegl1 libosmesa6 libsm6 libxext6 libxrender1 \
     libxi6 libxfixes3 libxrandr2 libxinerama1 libxcursor1 \
-    libxkbcommon0 libfontconfig1 libfreetype6 \
+    libxkbcommon0 libfontconfig1 libfreetype6 libspatialindex-dev \
     && rm -rf /var/lib/apt/lists/* \
     && conda create -n interpose python=3.8 -y \
     && conda create -n protomotions_interpose python=3.8 -y \
@@ -45,6 +45,7 @@ RUN curl -fL --retry 3 --connect-timeout 30 https://developer.nvidia.com/isaac-g
     && conda run -n protomotions_interpose pip install -e /app/InterPose/third-party/ProtoMotion_for_InterPose \
     && conda run -n protomotions_interpose pip install -r /app/InterPose/third-party/ProtoMotion_for_InterPose/requirements_isaacgym.txt \
     && conda run -n protomotions_interpose pip install -e /app/InterPose/third-party/ProtoMotion_for_InterPose/isaac_utils -e /app/InterPose/third-party/ProtoMotion_for_InterPose/poselib \
+    && conda run -n protomotions_interpose pip install --force-reinstall --no-binary Rtree Rtree==1.2.0 \
     && conda run -n protomotions_interpose pip check
 
 # LIGHT uses its own torch 2.5 / Python 3.10 environment and a matching
