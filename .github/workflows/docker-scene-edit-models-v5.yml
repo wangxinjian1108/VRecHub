@@ -1,0 +1,66 @@
+name: Docker – scene-edit-models-v5
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docker/apps/scene-edit-models-v5/**'
+      - 'thirdparty/InterPose'
+      - 'thirdparty/LIGHT'
+      - '.github/workflows/docker-scene-edit-models-v5.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docker/apps/scene-edit-models-v5/**'
+      - 'thirdparty/InterPose'
+      - 'thirdparty/LIGHT'
+      - '.github/workflows/docker-scene-edit-models-v5.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout model submodules
+        run: |
+          git config --global url."https://github.com/".insteadOf git@github.com:
+          git submodule update --init --recursive --depth 1 --jobs 2 thirdparty/InterPose thirdparty/LIGHT
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          sudo rm -rf /usr/share/swift /usr/local/graalvm /usr/local/.ghcup
+          sudo rm -rf /usr/local/share/powershell /usr/local/share/chromium
+          sudo docker image prune -af
+          df -h
+      - uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/scene-edit-models-v5
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/apps/scene-edit-models-v5/Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=scene-edit-models-v5
+          cache-to: type=gha,mode=max,scope=scene-edit-models-v5
