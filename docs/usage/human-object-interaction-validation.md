@@ -72,6 +72,16 @@ docker run --rm --gpus all --network none --shm-size=4g \
 `/models/omomo/stage1_object_split/model.pt` 和
 `/models/omomo/stage2_object_split/model.pt`。
 
+## 在 V2 聚合镜像上复测
+
+2026-11-25，使用 V2 候选镜像摘要
+`sha256:9fd1df2fb843a7de6856bfc276dae0a8885382bad3ddb71e680cb7f8eb91ad0d`
+重复了上述采样测试。CHOIS 的完整 1,000 步采样，以及 OMOMO 标准和
+object-split 权重的两阶段各 1,000 步采样均通过输出形状和有限值检查。
+权重从已有 V1 带权重镜像取出并只读挂载，V2 镜像本身不含这些权重；测试
+在 NVIDIA L4 上运行，并临时设置 `NVIDIA_DISABLE_REQUIRE=1` 以绕过镜像
+的驱动版本检查。测试输入仍为合成数据，不验证动作质量或人体网格。
+
 ## Blender 无头渲染
 
 2026-11-25，使用上述带权重的 V1 镜像，在无网络容器中运行 Blender 3.6.3
