@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
-# Override these references with immutable digests once all stages pass CI.
+# Pin GRAIL to its immutable digest after its stage passes CI.
 ARG GRAIL_IMAGE=ghcr.io/wangxinjian1108/hoi-grail-runtime:latest
 ARG HOI_IMAGE=ghcr.io/wangxinjian1108/human-object-interaction-v1@sha256:bd956d166bcf92367096c281fe5bf6902e82566e579094d189420dbebc8637b2
 ARG LIGHT_IMAGE=ghcr.io/wangxinjian1108/scene-edit-models-v5@sha256:60adbaf95bf7f7e725461b5d9b4365d2e56a5f28f24dde319fb4d8cad80e053a
-ARG INTERACT_IMAGE=ghcr.io/wangxinjian1108/hoi-interact-runtime:latest
-ARG HAIC_IMAGE=ghcr.io/wangxinjian1108/hoi-haic-runtime:latest
+ARG INTERACT_IMAGE=ghcr.io/wangxinjian1108/hoi-interact-runtime@sha256:586c62661be70edde9761b2366c51787e9777b9f8e07d0d17b50a9b56e212767
+ARG HAIC_IMAGE=ghcr.io/wangxinjian1108/hoi-haic-runtime@sha256:4740c6dd677ee900c1bba727a066c78a4b9ef349aba5d767291d7873b03d0f30
 FROM ${HOI_IMAGE} AS hoi
 FROM ${LIGHT_IMAGE} AS light
 FROM ${INTERACT_IMAGE} AS interact
