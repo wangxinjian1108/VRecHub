@@ -1,0 +1,44 @@
+name: Apply GRAIL CUDA component to HOI candidate
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'HOI candidate pinned by sha256 digest'
+        type: string
+        required: true
+      component:
+        description: 'GRAIL CUDA component pinned by sha256 digest'
+        type: string
+        required: true
+permissions:
+  contents: read
+  packages: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: scripts/hoi/compose
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+          cache: false
+      - run: go mod tidy && go test ./...
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compose patched candidate
+        env:
+          BASE: ${{ inputs.base }}
+          COMPONENT: ${{ inputs.component }}
+          OWNER: ${{ github.repository_owner }}
+          REVISION: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          go run . "$BASE" "$COMPONENT" \
+            "ghcr.io/$OWNER/human-object-interaction-v2:candidate-$REVISION-$RUN_ID"

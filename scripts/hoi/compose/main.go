@@ -42,13 +42,14 @@ func compose(base v1.Image, components []v1.Image) (v1.Image, error) {
 }
 
 func run() error {
-	if len(os.Args) != 7 {
-		return fmt.Errorf("usage: compose BASE@sha256:... HOI@sha256:... LIGHT@sha256:... INTERACT@sha256:... HAIC@sha256:... DESTINATION:tag")
+	if len(os.Args) != 4 && len(os.Args) != 7 {
+		return fmt.Errorf("usage: compose BASE@sha256:... COMPONENT@sha256:... [LIGHT@sha256:... INTERACT@sha256:... HAIC@sha256:...] DESTINATION:tag")
 	}
-	refs := make([]name.Reference, 5)
-	images := make([]v1.Image, 5)
+	count := len(os.Args) - 2
+	refs := make([]name.Reference, count)
+	images := make([]v1.Image, count)
 	opts := []remote.Option{remote.WithAuthFromKeychain(authn.DefaultKeychain), remote.WithPlatform(v1.Platform{OS: "linux", Architecture: "amd64"})}
-	for i, raw := range os.Args[1:6] {
+	for i, raw := range os.Args[1 : 1+count] {
 		if !strings.Contains(raw, "@sha256:") {
 			return fmt.Errorf("source image must be pinned by sha256 digest: %q", raw)
 		}
@@ -62,7 +63,7 @@ func run() error {
 			return fmt.Errorf("read %s: %w", ref, err)
 		}
 	}
-	dest, err := name.NewTag(os.Args[6], name.StrictValidation)
+	dest, err := name.NewTag(os.Args[len(os.Args)-1], name.StrictValidation)
 	if err != nil {
 		return fmt.Errorf("invalid destination tag: %w", err)
 	}
