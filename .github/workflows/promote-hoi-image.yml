@@ -1,0 +1,45 @@
+name: Tag validated HOI image
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Validated HOI candidate pinned by sha256 digest'
+        type: string
+        required: true
+permissions:
+  contents: read
+  packages: write
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+          cache: false
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag and verify the exact digest
+        working-directory: scripts/hoi/compose
+        env:
+          IMAGE: ${{ inputs.image }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE" =~ ^ghcr\.io/$OWNER/human-object-interaction-v2@sha256:[0-9a-f]{64}$ ]]
+          go mod tidy
+          source_digest=$(go run github.com/google/go-containerregistry/cmd/crane@v0.22.1 digest "$IMAGE")
+          if existing=$(go run github.com/google/go-containerregistry/cmd/crane@v0.22.1 digest "ghcr.io/$OWNER/human-object-interaction-v2:latest" 2>&1); then
+            test "$existing" = "$source_digest" || { echo 'Existing latest points to a different image; refusing to replace it.'; exit 1; }
+          else
+            [[ "$existing" == *MANIFEST_UNKNOWN* ]] || { echo "$existing"; exit 1; }
+          fi
+          go run github.com/google/go-containerregistry/cmd/crane@v0.22.1 tag "$IMAGE" latest
+          actual_digest=$(go run github.com/google/go-containerregistry/cmd/crane@v0.22.1 digest "ghcr.io/$OWNER/human-object-interaction-v2:latest")
+          test "$actual_digest" = "$source_digest"
+          echo "Published ghcr.io/$OWNER/human-object-interaction-v2:latest at $actual_digest"
