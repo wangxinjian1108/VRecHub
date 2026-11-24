@@ -78,3 +78,21 @@ GRAIL 的 GEM-X 环境位于 `/root/.cache/grail/envs/gem-x`，不要将宿主�
 LIGHT 与 InterAct 上游代码在解析参数前会加载 SMPL-H，因此在没有按上游
 目录挂载真实人体模型时，连推理脚本的 `--help` 都可能报错。构建时的入口
 检查只在测试进程中临时模拟人体模型创建，实际推理不会使用模拟对象。
+
+## GPU 基础检查
+
+在本仓库根目录，可以将检查脚本挂入已拉取的候选镜像，例如测试 LIGHT：
+
+```bash
+docker run --rm --gpus all --network none \
+  -v "$PWD/scripts/hoi/check_gpu.py:/tmp/check_gpu.py:ro" \
+  --entrypoint /opt/conda/envs/light/bin/python \
+  ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:72781fbc45e4087df7c020308d0fcea4c61dc3aff705ec25ae1738337ecbfdb7 \
+  /tmp/check_gpu.py light
+```
+
+脚本接受 `hoi`、`light`、`interact`、`haic`、`grail`。前四项对应
+`/opt/conda/envs/<环境名>/bin/python`；GRAIL 使用
+`/root/miniconda3/envs/grail/bin/python`。该检查执行简单的 CUDA 运算，
+并对适用环境测试 PyTorch3D、PointNet2 或 nvdiffrast；它不加载模型权重，
+也不替代真实数据上的完整生成或仿真测试。
