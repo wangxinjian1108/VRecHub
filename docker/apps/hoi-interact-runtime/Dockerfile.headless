@@ -1,0 +1,11 @@
+# syntax=docker/dockerfile:1
+FROM ghcr.io/wangxinjian1108/hoi-interact-runtime@sha256:586c62661be70edde9761b2366c51787e9777b9f8e07d0d17b50a9b56e212767
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive PYOPENGL_PLATFORM=egl PYGLET_HEADLESS=1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libegl1 libxrender1 libxext6 libx11-6 libsm6 libxfixes3 libosmesa6 \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app/InterAct/text2interaction
+RUN python -m sample.local_generate_obj --help >/dev/null \
+    && python -m sample.local_generate_obj_guide_contactv2 --help >/dev/null
+CMD ["bash"]
