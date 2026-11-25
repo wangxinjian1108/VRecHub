@@ -1,0 +1,13 @@
+# The environment was built by GitHub Actions; only weight layers are added locally.
+ARG BASE_IMAGE=ghcr.io/wangxinjian1108/human-object-interaction-v2:local-verified
+ARG WEIGHTS_IMAGE=repo-volc.zelostech.com.cn/zcloud/human-object-interaction-v1:latest
+FROM ${WEIGHTS_IMAGE} AS existing_weights
+FROM ${BASE_IMAGE}
+COPY --from=existing_weights /models /models
+ENV CHECKPOINT_DIR=/models/kimodo \
+    TEXT_ENCODERS_DIR=/models/text-encoders \
+    TEXT_ENCODER_MODE=local LOCAL_CACHE=True \
+    CLIP_MODEL_PATH=/models/clip/ViT-B-32.pt CLIP_DOWNLOAD_ROOT=/models/clip
+COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/chois-infer.sh /usr/local/bin/chois-infer
+COPY --chmod=755 docker/apps/human-object-interaction-v1-weights/omomo-infer.sh /usr/local/bin/omomo-infer
+CMD ["/bin/bash"]

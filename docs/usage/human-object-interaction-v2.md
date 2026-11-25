@@ -1,5 +1,9 @@
 # Human Object Interaction V2
 
+内网含权重版已发布为 `repo-volc.zelostech.com.cn/zcloud/human-object-interaction-v2:latest`，
+权重目录、固定摘要、离线运行与验证范围见
+[含权重版使用说明](human-object-interaction-v2-weights.md)。本页下方 GHCR 地址对应环境版。
+
 该镜像通过 GitHub Actions 构建和组合，包含 LIGHT、InterAct、GRAIL、
 HAIC、CHOIS、OMOMO、Kimodo 和 Blender。镜像的清单与各来源层已核对；
 具体验证范围和已知问题如下。
@@ -41,7 +45,7 @@ ghcr.io/wangxinjian1108/human-object-interaction-v2@sha256:89aa3801e1bdcd7499a8a
 超过 24 GiB。本机 L4 的驱动为 550.144.03，不能据此认定 GRAIL 或 HAIC
 仿真在本机可运行。
 
-此镜像没有主动打入上述模型的预训练权重、完整数据集或受许可限制的
+本页的 GHCR 环境镜像没有主动打入上述模型的预训练权重、完整数据集或受许可限制的
 SMPL-H／SMPL-X 人体模型。各模型还需要按上游说明准备对应 checkpoint、
 数据和人体模型；GRAIL 的示例数据含 Git LFS 文件，也需另行准备。
 
